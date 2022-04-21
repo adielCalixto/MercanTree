@@ -2,14 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.stat-value {
+    @apply font-bold;
+    @apply text-2xl;
 }
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1rem;
-    color: #fff;
+.container {
+    @apply px-4;
+    @apply my-10;
+}
+
+.container__child {
+    @apply p-2;
+    @apply bg-gray-100;
 }
