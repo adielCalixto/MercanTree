@@ -18,11 +18,13 @@ from django.urls import path, include
 from rest_framework import routers
 from users import views as UserViews
 from products import views as ProductViews
+from payments import views as PaymentViews
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViews.UserViewSet)
 router.register(r'products', ProductViews.ProductViewSet)
 router.register(r'suppliers', ProductViews.SupplierViewSet)
+router.register(r'payments', PaymentViews.PaymentViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
