@@ -1,26 +1,23 @@
 <template>
-  <div class="relative overflow-y-auto lg:ml-64 container mx-auto">
-    
-    <home-stats class="container__child" />
-
-    <home-products-overview class="container__child" />
-
-    <p class="text-center text-sm text-neutral mt-10 container__child">
-      &copy; 2019-2021 <a href="#" class="hover:underline" target="_blank">MultiTech</a>. All rights reserved.
-    </p>
+  <div>
+    <the-header />
+    <div class="flex overflow-hidden bg-white pt-16">      
+      <the-sidebar />
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
 
-import HomeStats from './HomeStats.vue'
-import HomeProductsOverview from './HomeProductsOverview.vue'
+import TheHeader from '../TheHeader.vue'
+import TheSidebar from '../TheSidebar.vue'
 
 export default {
   name: 'Home',
   components: {
-    HomeStats,
-    HomeProductsOverview,
+    TheHeader,
+    TheSidebar,
   },
   data: function() {
     return {
