@@ -9,14 +9,26 @@
             <a class="btn btn-ghost normal-case text-2xl">Mercan<span class="text-green-500">Tree</span></a>
         </div>
         <div class="flex-none">
-            <a class="btn normal-case w-32 btn-sm">Login</a>
+            <a class="btn normal-case btn-sm">Bem vindo {{ username }}</a>
         </div>
     </div>
 </template>
 
 <script lang="ts">
+    import { useStore } from '../stores/auth'
+    import { computed } from 'vue'
+
     export default {
         name: 'TheHeader',
+        setup() {
+            const store = useStore()
+            const username = computed(() => store.username)
+
+            return {
+                store,
+                username,
+            }
+        }
     }
 </script>
 
