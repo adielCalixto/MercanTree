@@ -17,7 +17,7 @@ class GetUserToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({
             'token': token.key,
-            'username': user.username,
+            'user_name': user.username,
             'user_id': user.pk
         })
 
