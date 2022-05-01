@@ -8,13 +8,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 
-import TheHeader from '../TheHeader.vue'
-import TheSidebar from '../TheSidebar.vue'
+import TheHeader from './TheHeader.vue'
+import TheSidebar from './TheSidebar.vue'
 
 export default {
-  name: 'Home',
+  name: 'MtApp',
   components: {
     TheHeader,
     TheSidebar,
