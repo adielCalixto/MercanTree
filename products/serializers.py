@@ -5,9 +5,11 @@ from .models import Supplier, Product
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'barcode', 'expires_at', 'price', 'category', 'supplier_id']
+        fields = ['id', 'name', 'description', 'barcode', 'expires_at', 'price', 'category', 'supplier_id']
+        read_only_fields = ['id']
 
 class SupplierSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Supplier
-        fields = ['name', 'email', 'phone', 'cnpj', 'responsable', 'address', 'city']
+        fields = ['id', 'name', 'email', 'phone', 'cnpj', 'responsable', 'address', 'city']
+        read_only_fields = ['id']
