@@ -9,3 +9,5 @@ class Payment(models.Model):
 
     type = models.CharField(max_length=2, choices=PaymentType.choices, default=PaymentType.DEBIT)
     is_paid = models.BooleanField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

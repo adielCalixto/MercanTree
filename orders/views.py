@@ -3,6 +3,7 @@ from rest_framework import permissions
 from .models import Order, OrderProduct
 from .serializers import OrderSerializer, OrderProductSerializer
 from django_filters import rest_framework as filters
+from rest_framework.filters import OrderingFilter
 
 
 class OrderFilter(filters.FilterSet):
@@ -17,11 +18,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderSerializer
-    filter_backends = [filters.DjangoFilterBackend]
+    filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
     filterset_class = OrderFilter
+    ordering_fields = ['created', 'value']
+    ordering = ['created']
 
 
 class OrderProductViewSet(viewsets.ModelViewSet):
     queryset = OrderProduct.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderProductSerializer
+    ordering = ['quantity']

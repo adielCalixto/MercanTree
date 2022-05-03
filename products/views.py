@@ -4,6 +4,7 @@ from rest_framework import permissions
 from .serializers import ProductSerializer, SupplierSerializer
 from rest_framework.filters import SearchFilter
 from django_filters import rest_framework as filters
+from rest_framework.filters import OrderingFilter
 
 
 class ProductFilter(filters.FilterSet):
@@ -18,9 +19,11 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [SearchFilter, filters.DjangoFilterBackend]
+    filter_backends = [SearchFilter, filters.DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     search_fields = ['name']
+    ordering_fields = ['name', 'created', 'price']
+    ordering = ['name']
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
@@ -29,3 +32,4 @@ class SupplierViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [SearchFilter]
     search_fields = ['name', 'email', 'phone', 'city', 'cnpj']
+    ordering = ['name']

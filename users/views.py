@@ -26,3 +26,4 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    ordering = ['username']

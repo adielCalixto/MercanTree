@@ -8,6 +8,8 @@ class Order(models.Model):
     value = models.IntegerField()
     user_id = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     payment_id = models.ForeignKey(Payment, on_delete=models.DO_NOTHING)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
 
 class OrderProduct(models.Model):

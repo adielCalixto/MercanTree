@@ -18,3 +18,5 @@ class Product(models.Model):
     price = models.FloatField()
     category = models.CharField(max_length=100)
     supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
