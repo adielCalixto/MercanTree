@@ -16,7 +16,7 @@ export const useStore = defineStore('auth', {
             return authModule.login({ username: user.username, password: user.password })
             .then(response => {
                 this.token = response.token
-                this.username = response.username
+                this.username = response.user_name
                 this.id = response.user_id
                 axios.defaults.headers.common['Authorization'] = `Token ${response.token}`;
                 return Promise.resolve()
