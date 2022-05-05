@@ -1,6 +1,6 @@
 <template>
     <div class="overflow-x-auto w-full">
-        <table class="table w-full">
+        <table class="table table-compact w-full">
             <thead>
                 <tr>
                     <th v-for="field in table.fields">

@@ -1,62 +1,74 @@
 <template>
     <div>
         <h1 class="text-2xl mb-12">Alterar produto</h1>
-        <h2 class="font-bold text-xl">Product name</h2>
+        <h2 class="font-bold text-xl mb-8">{{ product.name }}</h2>
 
-        <form class="relative">
-            <div class="form-control">
+        <form class="relative" @keydown="(e) => e.key == 'Enter' ? e.preventDefault() : e">
+            <div class="flex gap-4">
                 <label class="label">
-                    <span class="label-text">Nome</span>
+                    <span class="label-text">Nome:</span>
                 </label>
-                <input type="text" placeholder="Nome" class="input max-w-md input-sm input-bordered">
+                <input v-model="product.name" type="text"  class="input max-w-md input-sm input-bordered">
             </div>
-            <div class="form-control w-full my-4">
+            <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Descrição</span>
+                    <span class="label-text">Descrição:</span>
                 </label>
-                <input type="text" placeholder="Descrição" class="input max-w-md input-sm input-bordered">
+                <input v-model="product.description" type="text" class="input max-w-md input-sm input-bordered">
             </div>
-            <div class="form-control w-full my-4">
+            <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Categoria</span>
+                    <span class="label-text">Categoria:</span>
                 </label>
-                <select class="select select-sm select-bordered w-full max-w-xs">
+                <select v-model="product.category" class="select select-sm select-bordered w-full max-w-xs">
                     <option disabled selected>Categoria</option>
-                    <option>Grãos</option>
-                    <option>Limpeza</option>
-                    <option>Outros</option>
+                    <option value="Grãos">Grãos</option>
+                    <option value="Limpeza">Limpeza</option>
+                    <option value="Outros">Outros</option>
                 </select>
             </div>
-            <div class="form-control w-full my-4">
+            <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Preço</span>
+                    <span class="label-text">Preço:</span>
                 </label>
-                <input type="number" placeholder="Preço" class="input max-w-md input-sm input-bordered">
+                <input v-model="product.price" type="number" class="input max-w-md input-sm input-bordered">
             </div>
-            <div class="form-control w-full my-4">
+            <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Validade</span>
+                    <span class="label-text">Preço de compra:</span>
                 </label>
-                <input type="date" class="input max-w-md input-sm input-bordered">
+                <input v-model="product.supplier_price" type="number" class="input max-w-md input-sm input-bordered">
             </div>
-            <div class="form-control w-full my-4">
+            <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Código de barras</span>
+                    <span class="label-text">Quantidade:</span>
                 </label>
-                <input type="text" placeholder="Descrição" class="input max-w-md input-sm input-bordered">
+                <input v-model="product.quantity" type="number" class="input max-w-md input-sm input-bordered">
             </div>
-            <div class="form-control w-full my-4">
+            <div class="flex gap-4 w-full my-4">
+                <label class="label">
+                    <span class="label-text">Validade:</span>
+                </label>
+                <input v-model="product.expires_at" type="date" class="input max-w-md input-sm input-bordered">
+            </div>
+            <div class="flex gap-4 w-full my-4">
+                <label class="label">
+                    <span class="label-text">Código de barras:</span>
+                </label>
+                <input v-model="product.barcode" type="text" class="input max-w-md input-sm input-bordered">
+            </div>
+            <div class="flex gap-4 w-full my-4">
                 <label class="label">
                     <span class="label-text">Fornecedor</span>
                 </label>
-                <select class="select select-sm select-bordered w-full max-w-xs">
+                <select v-model="product.supplier_id" class="select select-sm select-bordered w-full max-w-xs">
                     <option disabled selected>Fornecedor</option>
-                    <option>Exemplo</option>
+                    <option value="">Exemplo</option>
                 </select>
             </div>
-            <div class="flex justify-end bg-gray-100 p-4">
-                <button class="btn btn-error btn-sm btn-outline mr-4">Deletar</button>
-                <button class="btn btn-primary btn-sm">Salvar</button>
+            <div class="flex justify-end gap-4 bg-gray-100 p-4">
+                <button class="btn btn-error btn-outline btn-sm" @click.prevent="deleteProduct()">Deletar</button>
+                <button class="btn btn-secondary btn-sm" @click.prevent="updateProduct()">Salvar</button>
             </div>
         </form>
     </div>
@@ -64,15 +76,66 @@
 
 <script lang="ts">
 
-import { defineComponent } from "vue"
+import { defineComponent, ref } from "vue"
+import { useRoute, useRouter } from "vue-router"
+import productsService from "../../services/modules/products.module"
+import { Product } from '../../interfaces/products/product.interface'
 
 export default defineComponent({
     name: 'MtPage',
-    data() {
+    async setup() {
+        const route = useRoute()
+        const router = useRouter()
+        const id = parseInt(route.params.id.toString())
+        const product = ref<Product>({
+            name: '',
+            description: '',
+            price: 0,
+            barcode: '',
+            supplier_id: undefined,
+            category: '',
+            expires_at: new Date(),
+            supplier_price: 0.0,
+            quantity: 0,
+        })
+
+        const error = ref()
+        const isLoading = ref(false)
+
+        try {
+            isLoading.value = true
+            const response = await productsService.retrieve(id)
+            product.value = response
+            isLoading.value = false
+        } catch(e) {
+            router.push('/products')
+        }
+
+        const updateProduct = async () => {
+            try {
+                const response = await productsService.update(id, product.value)
+                product.value = response
+                router.push('/products')
+            } catch(e) {
+                error.value = e
+            }
+        }
+
+        const deleteProduct = async () => {
+            try {
+                const response = await productsService.destroy(id)
+                router.push('/products')
+            } catch(e) {
+                error.value = e
+            }
+        }
+
         return {
-            data: [{
-                name: 'sample'
-            }]
+            product,
+            error,
+            isLoading,
+            updateProduct,
+            deleteProduct,
         }
     },
 })

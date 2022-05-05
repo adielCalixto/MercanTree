@@ -14,22 +14,45 @@ const routes = [
             component: MtModelPage,
             name: 'Produtos',
             children: [
-            {
-                path: '',
-                name: 'Listar',
-                component: () => import('../components/Products/ProductsPage.vue'),
-            },
-            {
-                path: 'create',
-                name: 'Criar',
-                component: () => import('../components/Products/ProductCreatePage.vue'),
-            },
-            {
-                path: 'product/:id',
-                name: 'Alterar produto',
-                component: () => import('../components/Products/ProductViewPage.vue'),
-            },
-        ] },
+                {
+                    path: '',
+                    name: 'Listar produto',
+                    component: () => import('../components/Products/ProductsPage.vue'),
+                },
+                {
+                    path: 'create',
+                    name: 'Criar produto',
+                    component: () => import('../components/Products/ProductCreatePage.vue'),
+                },
+                {
+                    path: 'product/:id',
+                    name: 'Alterar produto',
+                    component: () => import('../components/Products/ProductViewPage.vue'),
+                },
+            ] 
+        },
+        { 
+            path: '/suppliers',
+            component: MtModelPage,
+            name: 'Fornecedores',
+            children: [
+                {
+                    path: '',
+                    name: 'Listar fornecedor',
+                    component: () => import('../components/Suppliers/SuppliersPage.vue'),
+                },
+                {
+                    path: 'create',
+                    name: 'Criar fornecedor',
+                    component: () => import('../components/Suppliers/SupplierCreatePage.vue'),
+                },
+                {
+                    path: 'supplier/:id',
+                    name: 'Alterar fornecedor',
+                    component: () => import('../components/Suppliers/SupplierViewPage.vue'),
+                },
+            ] 
+        },
     ] },
     { path: '/login', component: Login },
 ]

@@ -1,17 +1,15 @@
 <template>
     <div>
-        <h1 class="text-xl mb-12">Lista de Produtos</h1>
+        <h1 class="text-xl mb-12">Lista de Fornecedores</h1>
 
         <div class="my-4 flex justify-between">
             <router-link :to="$route.fullPath + '/create'" class="btn btn-success btn-sm">Adicionar</router-link>
             <select v-model="ordering"
-            @change="listProducts()"
+            @change="listSuppliers()"
             class="select select-sm select-bordered ml-auto mr-4">
                 <option value="" disabled selected>Ordenar</option>
                 <option value="name">Nome-ASC</option>
                 <option value="-name">Nome-DESC</option>
-                <option value="price">Preço-ASC</option>
-                <option value="-price">Preço-DESC</option>
             </select>
             <div class="form-control">
                 <div class="input-group">
@@ -21,30 +19,29 @@
                     class="input input-sm input-bordered"
                     v-model="search" >
 
-                    <button @click="activePage = 1, listProducts()" class="btn btn-square btn-sm">
+                    <button @click="activePage = 1, listSuppliers()" class="btn btn-square btn-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div v-if="products.count == 0">
+        <div v-if="suppliers.count == 0">
             Nenhum produto encontrado
         </div>
 
         <mt-table :table="table" v-else >
-            <tr v-for="product in products.results">
-                <th> {{ product.id }}</th>
-                <th> {{ product.name }} </th>
-                <th> {{ product.description }} </th>
-                <th> {{ product.expires_at }} </th>
-                <th> {{ product.price }} </th>
-                <th> {{ product.barcode }} </th>
-                <th> {{ product.quantity }} </th>
-                <th> {{ product.category }} </th>
-                <th> {{ product.supplier_id }} </th>
+            <tr v-for="supplier in suppliers.results">
+                <th> {{ supplier.id }}</th>
+                <th> {{ supplier.name }} </th>
+                <th> {{ supplier.responsable }} </th>
+                <th> {{ supplier.email }} </th>
+                <th> {{ supplier.phone }} </th>
+                <th> {{ supplier.city }} </th>
+                <th> {{ supplier.address }} </th>
+                <th> {{ supplier.cnpj }} </th>
                 <th>
-                    <router-link :to="`/products/product/${product.id}`" class="btn btn-primary btn-sm">View</router-link>
+                    <router-link :to="`/suppliers/supplier/${supplier.id}`" class="btn btn-primary btn-sm">View</router-link>
                 </th>
             </tr>
         </mt-table>
@@ -54,7 +51,7 @@
                 <button class="btn btn-sm"
                 v-for="page in pages"
                 :class="{'btn-active': page == activePage}"
-                @click="activePage = page, listProducts()">{{ page }}</button>
+                @click="activePage = page, listSuppliers()">{{ page }}</button>
             </div>
         </div>
     </div>
@@ -64,10 +61,10 @@
 
 import { defineComponent, ref, computed, onBeforeMount } from 'vue'
 import MtTable from "../MtTable.vue"
-import ProductService from '../../services/modules/products.module'
-import { Product } from '../../interfaces/products/product.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { RouterLink } from 'vue-router'
+import { Supplier } from '../../interfaces/suppliers/supplier.interface'
+import SupplierService from '../../services/modules/supplier.module'
 import { PAGE_SIZE } from '../../consts'
 
 export default defineComponent({
@@ -77,48 +74,47 @@ export default defineComponent({
     },
     async setup() {
         const table = {
-            name: 'Produtos',
+            name: 'Fornecedores',
             fields: [
                 '',
                 'Nome',
-                'Descrição',
-                'Validade',
-                'Price',
-                'Código de barras',
-                'Quantidade',
-                'Categoria',
-                'Fornecedor',
-                '',
+                'Responsável',
+                'Email',
+                'Telefone',
+                'Cidade',
+                'Endereço',
+                'CNPJ',
+                ''
             ],
         }
 
         const search = ref('')
         const ordering = ref('')
         const error = ref()
-        const products = ref<APIListResponse<Product>>({count: 0, results: []})
+        const suppliers = ref<APIListResponse<Supplier>>({count: 0, results: []})
         const isLoading = ref(false)
-        const pages = computed(() => Math.floor((products.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
+        const pages = computed(() => Math.floor((suppliers.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
         const activePage = ref(1)
 
-        const listProducts = async () => {
+        const listSuppliers = async () => {
             try {
                 isLoading.value = true
-                const response = await ProductService.list(activePage.value, search.value, ordering.value)
-                products.value = response
+                const response = await SupplierService.list(activePage.value, search.value, ordering.value)
+                suppliers.value = response
                 isLoading.value = false
             } catch(e) {
                 error.value = e
             }
         }
 
-        onBeforeMount(listProducts)
+        onBeforeMount(listSuppliers)
 
         return {
             table,
-            products,
+            suppliers,
             error,
             search,
-            listProducts,
+            listSuppliers,
             pages,
             activePage,
             ordering,
