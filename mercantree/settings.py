@@ -66,7 +66,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50,
+    'PAGE_SIZE': 25,
     'DEFAULT_FILTERING_CLASSES': ['rest_framework.filters.OrderingFilter'],
 }
 
