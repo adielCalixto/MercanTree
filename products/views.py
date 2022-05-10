@@ -1,14 +1,9 @@
 from .models import Product, Supplier
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, mixins
 from .serializers import ProductSerializer, SupplierSerializer
 from rest_framework.filters import SearchFilter
 from django_filters import rest_framework as filters
 from rest_framework.filters import OrderingFilter
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.db.models import Sum
-from django.core.exceptions import ObjectDoesNotExist
-from orders.models import OrderProduct
 
 
 class ProductFilter(filters.FilterSet):
@@ -28,23 +23,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'barcode']
     ordering_fields = ['name', 'created', 'price']
     ordering = ['name']
-
-    @action(detail=True, methods=['get'])
-    def in_stock_count(self, request, pk=None):
-        try:
-            product = Product.objects.get(id=pk)
-        except ObjectDoesNotExist:
-            return Response({'detail': 'Not found.'},
-                            status=status.HTTP_404_NOT_FOUND)
-
-        serializer = self.get_serializer(product)
-        product_count = serializer.data['quantity']
-
-        in_order_count = OrderProduct.objects.filter(product_id=pk).aggregate(Sum('quantity'))
-        count = product_count - (in_order_count['quantity__sum'] if in_order_count['quantity__sum'] else 0)
-
-        return Response({'count': count},
-                        status.HTTP_200_OK)
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
