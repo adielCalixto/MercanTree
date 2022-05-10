@@ -20,8 +20,8 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
     filterset_class = OrderFilter
-    ordering_fields = ['created', 'value']
-    ordering = ['created']
+    ordering_fields = ['created', 'price']
+    ordering = ['-created']
 
 
 class OrderProductViewSet(viewsets.ModelViewSet):
