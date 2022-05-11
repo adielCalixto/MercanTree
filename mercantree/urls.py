@@ -30,7 +30,8 @@ router.register(r'suppliers', ProductViews.SupplierViewSet)
 router.register(r'category', ProductViews.CategoryViewSet)
 router.register(r'payments', PaymentViews.PaymentViewSet)
 router.register(r'orders', OrderViews.OrderViewSet)
-router.register(r'orderproducts', OrderViews.OrderProductViewSet)
+router.register(r'items', OrderViews.OrderProductViewSet)
+router.register(r'coupons', OrderViews.CouponViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
