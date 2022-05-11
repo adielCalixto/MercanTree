@@ -1,20 +1,20 @@
 interface User {
-    username: String,
-    email: String,
-    is_admin: Boolean,
-    id?: Number,
-    password: String,
+    username: string,
+    email: string,
+    is_admin: boolean,
+    id?: number,
+    password: string,
 }
 
 interface LoggedUser {
-    token: String,
-    username: String,
-    id: Number|undefined,
+    token: string,
+    username: string,
+    id?: number,
 }
 
 interface LoginUser {
-    password: String,
-    username: String,
+    password: string,
+    username: string,
 }
 
 export type { LoggedUser, LoginUser, User }

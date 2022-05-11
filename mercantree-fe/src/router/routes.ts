@@ -10,6 +10,23 @@ const routes = [
             component: HomePage,
         },
         { 
+            path: '/sell',
+            component: MtModelPage,
+            name: 'Vendas',
+            children: [
+                {
+                    path: '',
+                    name: 'Listar vendas',
+                    component: () => import('../components/Sell/SellPage.vue'),
+                },
+                {
+                    path: 'create',
+                    name: 'Criar venda',
+                    component: () => import('../components/Sell/SellCreatePage.vue'),
+                },
+            ] 
+        },
+        { 
             path: '/products',
             component: MtModelPage,
             name: 'Produtos',

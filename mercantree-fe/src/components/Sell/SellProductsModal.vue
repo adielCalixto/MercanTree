@@ -1,0 +1,67 @@
+<template>
+    <div>
+        <mt-table :table="table">
+            <tr v-for="product in products.results">
+                <th></th>
+                <th> {{ product.name }} </th>
+                <th> {{ product.description }} </th>
+                <th> {{ product.price }} </th>
+                <th> {{ product.barcode }} </th>
+                <th> {{ product.quantity }} </th>
+                <th> {{ product.category }} </th>
+                <th><button @click="$emit('selected', product)" class="btn btn-sm">Selecionar</button></th>
+            </tr>
+        </mt-table>
+        <button @click="$emit('close')" class="btn btn-sm btn-outline">Close</button>
+    </div>
+</template>
+
+<script setup lang="ts">
+    import { defineComponent, ref, defineProps, computed, defineEmits, onMounted } from 'vue'
+    import ProductsService from '../../services/modules/products.module'
+    import { Product } from '../../interfaces/products/product.interface'
+    import { APIListResponse } from '../../interfaces/common/response.interface';
+    import { PAGE_SIZE } from '../../consts'
+    import MtTable from '../MtTable.vue'
+
+    interface Props {
+        search: string;
+    }
+
+    interface Emits {
+        (e: 'selected', value: Product): void,
+        (e: 'close'): void,
+    }
+
+    const error = ref()
+    const emit = defineEmits<Emits>()
+    const props = defineProps<Props>()
+    const products = ref<APIListResponse<Product>>({ count: 0, results: [] })
+    const pages = computed(() => Math.floor((products.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
+    const activePage = ref(1)
+    const table = {
+        name: 'Produtos',
+        fields: [
+            '',
+            'Nome',
+            'Descrição',
+            'Preço',
+            'Código de barras',
+            'Quantidade',
+            'Categoria',
+            '',
+        ],
+    }
+
+    const listProducts = async () => {
+        try {
+            const response = await ProductsService.list(activePage.value, props.search)
+            products.value = response
+        }
+        catch(e) {
+            error.value = e
+        }
+    }
+
+    onMounted(listProducts)
+</script>

@@ -1,0 +1,66 @@
+import axios from '../axios'
+import Order from '../../interfaces/orders/order.interface'
+import { APIListResponse } from '../../interfaces/common/response.interface'
+import OrderProduct from '../../interfaces/orders/order_product.interface'
+import Payment from '../../interfaces/payments/payment.interface';
+
+
+class OrderService {
+    list(page: number = 1, search: string = '', ordering: string = ''): Promise<APIListResponse<Order>> {
+        return axios.get(`api/orders/?page=${page}&search=${search}&ordering=${ordering}`)
+        .then(response => {
+            return Promise.resolve(response.data)
+        })
+        .catch(error => {
+            return Promise.reject(error)
+        })
+    }
+
+    retrieve(id: number): Promise<Order> {
+        return axios.get(`api/orders/${id}`)
+        .then(response => {
+            return Promise.resolve(response.data)
+        })
+        .catch(error => {
+            return Promise.reject(error)
+        })
+    }
+
+    create({ user, payment }: Order): Promise<Order> {
+        return axios.post('api/orders/', {
+            user,
+            payment,
+        })
+        .then(response => {
+            return Promise.resolve(response.data)
+        })
+        .catch(error => {
+            return Promise.reject(error)
+        })
+    }
+
+    update(id:number, { user, payment }: Order): Promise<Order> {
+        return axios.put(`api/orders/${id}/`, {
+            user,
+            payment,
+        })
+        .then(response => {
+            return Promise.resolve(response.data)
+        })
+        .catch(error => {
+            return Promise.reject(error)
+        })
+    }
+
+    destroy(id: number): Promise<String> {
+        return axios.delete(`api/orders/${id}/`)
+        .then(response => {
+            return Promise.resolve(response.statusText)
+        })
+        .catch(error => {
+            return Promise.reject(error)
+        })
+    }
+}
+
+export default new OrderService()

@@ -1,14 +1,14 @@
 interface Product {
-    name: String;
-    id?: Number;
-    description: String;
+    name: string;
+    id?: number;
+    description: string;
     expires_at: Date;
-    price: Number;
-    barcode: String;
-    category: String;
-    supplier_id?: Number;
-    supplier_price: Number;
-    quantity: Number;
+    price: number;
+    barcode: string;
+    category: string;
+    supplier_id?: number;
+    supplier_price: number;
+    quantity: number;
 }
 
 export type { Product }
