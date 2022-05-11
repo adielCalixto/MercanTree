@@ -1,13 +1,22 @@
+from secrets import choice
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+
+CHARGE_CHOICES = (
+    ('CD', 'CashDeposit'),
+)
+
+
 class Payment(models.Model):
-    class PaymentType(models.TextChoices):
-        DEBIT = 'DB', _('DEBIT')
-        CREDIT_CARD = 'CD', _('CREDIT_CARD')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    is_paid = models.BooleanField(blank=True, default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
-    type = models.CharField(max_length=2, choices=PaymentType.choices, default=PaymentType.DEBIT)
-    is_paid = models.BooleanField()
+
+class PaymentCharge(models.Model):
+    payment = models.ForeignKey(Payment, on_delete=models.CASCADE)
+    charge = models.DecimalField(max_digits=10, decimal_places=2)
+    type = models.CharField(max_length=2, choices=CHARGE_CHOICES)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
