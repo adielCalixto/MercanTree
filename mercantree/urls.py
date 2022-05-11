@@ -23,9 +23,11 @@ from payments import views as PaymentViews
 from orders import views as OrderViews
 
 router = routers.DefaultRouter()
+
 router.register(r'users', UserViews.UserViewSet)
 router.register(r'products', ProductViews.ProductViewSet)
 router.register(r'suppliers', ProductViews.SupplierViewSet)
+router.register(r'category', ProductViews.CategoryViewSet)
 router.register(r'payments', PaymentViews.PaymentViewSet)
 router.register(r'orders', OrderViews.OrderViewSet)
 router.register(r'orderproducts', OrderViews.OrderProductViewSet)

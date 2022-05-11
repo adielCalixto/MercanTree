@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from .models import Supplier, Product
+from .models import Category, Supplier, Product
 from django.db.models import Sum
 from orders.models import OrderProduct
 
 
 class ProductSerializer(serializers.ModelSerializer):
     stock_quantity = serializers.SerializerMethodField()
+    category = serializers.SlugRelatedField('name', queryset=Category.objects.all())
 
     class Meta:
         model = Product
@@ -25,4 +26,11 @@ class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
         fields = ['id', 'name', 'email', 'phone', 'cnpj', 'responsable', 'address', 'city']
+        read_only_fields = ['id']
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
         read_only_fields = ['id']

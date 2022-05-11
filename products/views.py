@@ -1,6 +1,6 @@
-from .models import Product, Supplier
+from .models import Category, Product, Supplier
 from rest_framework import viewsets, permissions, mixins
-from .serializers import ProductSerializer, SupplierSerializer
+from .serializers import CategorySerializer, ProductSerializer, SupplierSerializer
 from rest_framework.filters import SearchFilter
 from django_filters import rest_framework as filters
 from rest_framework.filters import OrderingFilter
@@ -31,4 +31,12 @@ class SupplierViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'email', 'phone', 'city', 'cnpj']
+    ordering = ['name']
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [OrderingFilter]
     ordering = ['name']
