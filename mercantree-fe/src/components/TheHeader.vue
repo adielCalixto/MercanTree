@@ -8,30 +8,52 @@
         <div class="flex-1">
             <a class="btn btn-ghost normal-case text-2xl">Mercan<span class="text-green-500">Tree</span></a>
         </div>
-        <div class="flex-none">
-            <a class="btn normal-case btn-sm">Bem vindo {{ username }}</a>
+        <div class="flex-none relative">
+            <a @click="showUserInfo = !showUserInfo" class="btn btn-primary normal-case btn-square btn-sm"><font-awesome-icon icon="user-check" /></a>
+
+            <div v-if="showUserInfo" class="bg-neutral rounded text-center text-neutral-content p-2 absolute mt-1 right-0 top-full w-40">
+                <p>{{ username }}</p>
+                <router-link to="/account" class="link text-sm mt-4">
+                    Detalhes 
+                    <font-awesome-icon class="ml-1" icon="external-link" />
+                </router-link>
+
+                <div class="divider divider-horizontal my-4"></div>
+
+                <button @click="logOut()" class="btn btn-sm btn-ghost btn-block">Sair</button>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
     import { useStore } from '../stores/auth'
-    import { computed } from 'vue'
+    import { computed, ref } from 'vue'
+    import { useRouter } from 'vue-router'
 
     export default {
         name: 'TheHeader',
         setup() {
             const store = useStore()
             const username = computed(() => store.username)
+            const showUserInfo = ref(false)
+            const router = useRouter()
 
             const openSidebar = () => {
                 document.body.classList.toggle('sidebar--open')
+            }
+
+            const logOut = async () => {
+                store.logoutUser()
+                router.push('/login')
             }
 
             return {
                 store,
                 username,
                 openSidebar,
+                showUserInfo,
+                logOut,
             }
         }
     }
