@@ -8,6 +8,7 @@ django = "*"
 django-rest-framework = "*"
 django-filter = "*"
 django-cors-headers = "*"
+drf-flex-fields = "*"
 
 [dev-packages]
 
