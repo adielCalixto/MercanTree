@@ -12,19 +12,6 @@
                 <option value="created">Data-ASC</option>
                 <option value="-created">Data-DESC</option>
             </select>
-            <div class="form-control">
-                <div class="input-group">
-                    <input
-                    type="text"
-                    placeholder="Search…"
-                    class="input input-sm input-bordered"
-                    v-model="search" >
-
-                    <button @click="activePage = 1, listOrders()" class="btn btn-square btn-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </button>
-                </div>
-            </div>
         </div>
 
         <div v-if="orders.count == 0">
@@ -34,8 +21,11 @@
         <mt-table :table="table" v-else >
             <tr v-for="order in orders.results">
                 <th></th>
+                <th>{{ order.payment.amount }}</th>
+                <th>{{ order.created }}</th>
+                <th>{{ order.status }}</th>
+                <th>{{ order.payment.is_paid }}</th>
                 <th>{{ order.user }}</th>
-                <th>{{ order.payment }}</th>
                 <th>
                     <router-link :to="`/products/product/${order.id}`" class="btn btn-primary btn-sm">View</router-link>
                 </th>
@@ -63,7 +53,6 @@
 
 import MtTable from '../MtTable.vue'
 import { defineComponent, ref, onBeforeMount } from 'vue'
-import { RouterLink } from 'vue-router'
 import Order from '../../interfaces/orders/order.interface'
 import OrderService from '../../services/modules/order.module'
 import { APIListResponse } from '../../interfaces/common/response.interface'
@@ -80,14 +69,16 @@ export default defineComponent({
             name: 'Vendas',
             fields: [
                 '',
-                'Cadastrante',
+                'Valor',
+                'Data',
+                'Status',
                 'Pagamento',
+                'Cadastrante',
                 '',
             ]
         }
         const isLoading = ref(false)
         const creationModal = ref(false)
-        const search = ref('')
         const activePage = ref(1)
         const ordering = ref('')
         const orders = ref<APIListResponse<Order>>({count: 0, results: []})
@@ -96,7 +87,7 @@ export default defineComponent({
         const listOrders = async () => {
             try {
                 isLoading.value = true
-                const response = await OrderService.list(activePage.value, search.value, ordering.value)
+                const response = await OrderService.list(activePage.value, '', ordering.value)
                 isLoading.value = false
 
                 orders.value = response
@@ -112,7 +103,6 @@ export default defineComponent({
             error,
             isLoading,
             orders,
-            search,
             ordering,
             listOrders,
             pages,

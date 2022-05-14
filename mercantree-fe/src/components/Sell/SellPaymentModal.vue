@@ -2,7 +2,7 @@
     <div>
         <h1 class="text-xl text-base-content mb-8">Tipo de pagamento</h1>
         <div class="collapse collapse-open">
-            <div @click="e => { e.target?.parentNode.classList.toggle('collapse-open') }" class="collapse-title bg-primary text-primary-content">
+            <div class="collapse-title bg-primary text-primary-content">
                 Dinheiro
             </div>
             <div class="collapse-content bg-base-200 text-nase-content"> 
@@ -32,7 +32,8 @@
 </template>
 
 <script setup lang="ts">
-    import { defineComponent, defineEmits, defineProps, computed, ref} from 'vue'
+    import { defineEmits, defineProps, computed, ref} from 'vue'
+    import { useRouter } from 'vue-router';
     import Payment from '../../interfaces/payments/payment.interface';
     import paymentModule from '../../services/modules/payment.module';
 
@@ -46,14 +47,21 @@
 
     const props = defineProps<Props>()
     const emit = defineEmits<Emits>()
+    const router = useRouter()
     const price = computed(() => parseFloat(props.payment.amount))
     const received = ref(0)
     const back = computed(() => received.value - price.value)
 
     const payOrder = async () => {
         if(props.payment.id) {
-            const response = await paymentModule.charge(props.payment.id, (received.value - back.value))
-            emit('close')
+            try {
+                const response = await paymentModule.charge(props.payment.id, (received.value - back.value))
+                emit('close')
+                router.push('/sell')
+            }
+            catch(e) {
+                console.log(e)
+            }
         }
     }
 </script>

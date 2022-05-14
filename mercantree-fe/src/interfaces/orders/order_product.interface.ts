@@ -1,8 +1,8 @@
 interface OrderProduct {
-    order: number;
     product: number;
     quantity: number;
-    id?: number;
+    id?: string;
+    order?: number;
 }
 
 export default OrderProduct

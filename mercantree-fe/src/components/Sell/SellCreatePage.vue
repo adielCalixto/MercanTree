@@ -11,8 +11,8 @@
                     </div>
                 </form>
 
-                <div v-if="product != undefined">
-                    {{ product.name }}
+                <div v-if="selectedProduct != undefined">
+                    {{ selectedProduct.name }}
                 </div>
 
                 <div class="flex md:ml-auto">
@@ -77,7 +77,7 @@
         </div>
 
         <div class="bg-base-200 p-2 flex justify-end">
-            <button @click="payOrder()" class="btn btn-sm btn-error btn-outline">Pagar</button>
+            <button @click="saveOrder(), paymentModalOpen = true" class="btn btn-sm btn-error btn-outline">Pagar</button>
         </div>
 
         <div class="modal modal-open" v-if="createModalOpen">
@@ -88,7 +88,14 @@
 
         <div class="modal modal-open" v-if="paymentModalOpen">
             <div class="modal-box max-w-2xl">
-                <sell-payment-modal v-if="payment" :payment="payment" @close="paymentModalOpen = false" />
+                <sell-payment-modal v-if="order?.payment" :payment="order?.payment" @close="paymentModalOpen = false" />
+
+                <div v-else>
+                    Loading...
+                </div>
+            </div>
+            <div class="modal-toggle">
+                <button @click="paymentModalOpen = false" class="btn">Close</button>
             </div>
         </div>
     </div>
@@ -103,9 +110,6 @@
     import { useStore } from '../../stores/auth'
     import SellProductsModal from './SellProductsModal.vue'
     import SellPaymentModal from './SellPaymentModal.vue'
-    import paymentModule from '../../services/modules/payment.module'
-    import Payment from '../../interfaces/payments/payment.interface'
-import order_productModule from '../../services/modules/order_product.module'
 
     interface ProductWithQuantity {
         quantity: number;
@@ -122,9 +126,12 @@ import order_productModule from '../../services/modules/order_product.module'
         const quantity = ref(0)
         const error = ref();
         const store = useStore();
-        const product = ref<Product>();
+
+        const selectedProduct = ref<Product>();
         const products = ref<ProductWithQuantity[]>([])
-        const payment = ref<Payment>();
+
+        const order = ref<Order>()
+        
         const createModalOpen = ref(false);
         const paymentModalOpen = ref(false);
         const price = computed(() => {
@@ -136,52 +143,40 @@ import order_productModule from '../../services/modules/order_product.module'
 
         const saveOrder = async () => {
             try {
-                if (payment.value !== undefined) {
-                    const order: Order = {
-                        user: store.id,
-                        payment: payment.value.id
-                    }
+                if(!store.id)
+                    return
 
-                    const response = await OrderService.create(order);
-
-                    products.value.map(async (p) => {
-                        order_productModule.create({
-                            order: response.id,
-                            product: p.data.id,
-                            quantity: p.quantity
-                        })
+                order.value = {
+                    user: store.id,
+                    payment: {
+                        amount: price.value.toFixed(2),
+                        is_paid: false,
+                    },
+                    products: products.value.map(p => {
+                        return {
+                            quantity: p.quantity,
+                            product: p.data.id
+                        }
                     })
                 }
+
+                const response = await OrderService.create(order.value)
+                order.value = response
             }
             catch (e) {
                 error.value = e;
             }
         }
 
-        const payOrder = async () => {
-            if(payment.value == undefined) {
-                const response = await paymentModule.create({
-                    amount: price.value.toFixed(2),
-                    is_paid: false,
-                })
-
-                payment.value = response
-
-                saveOrder()
-
-                paymentModalOpen.value = true
-            }
-        }
-
         const preloadProduct = (p: Product) => {
-            product.value = p
+            selectedProduct.value = p
             createModalOpen.value = false
         }
 
         const addProduct = () => {
-            if(product.value != undefined) {
+            if(selectedProduct.value != undefined) {
                 products.value.push({
-                    data: product.value,
+                    data: selectedProduct.value,
                     quantity: quantity.value,
                 })
             }
@@ -189,11 +184,10 @@ import order_productModule from '../../services/modules/order_product.module'
 
         return {
             search,
-            product,
+            selectedProduct,
             error,
+            order,
             saveOrder,
-            payOrder,
-            payment,
             createModalOpen,
             paymentModalOpen,
             addProduct,

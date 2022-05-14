@@ -1,13 +1,11 @@
 import axios from '../axios'
 import Order from '../../interfaces/orders/order.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
-import OrderProduct from '../../interfaces/orders/order_product.interface'
-import Payment from '../../interfaces/payments/payment.interface';
 
 
 class OrderService {
-    list(page: number = 1, search: string = '', ordering: string = ''): Promise<APIListResponse<Order>> {
-        return axios.get(`api/orders/?page=${page}&search=${search}&ordering=${ordering}`)
+    list(page: number = 1, search: string = '', ordering: string = '', omit: string = ''): Promise<APIListResponse<Order>> {
+        return axios.get(`api/orders/?page=${page}&search=${search}&ordering=${ordering}&omit=${omit}`)
         .then(response => {
             return Promise.resolve(response.data)
         })
