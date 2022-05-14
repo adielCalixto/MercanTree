@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-md mx-auto my-16 p-4">
+    <div class="max-w-md mx-auto py-16 p-4">
         <div class="text-center py-2 bg-primary text-gray-100">
             <h1 class="text-xl">Faça login no sistema</h1>
         </div>
