@@ -3,7 +3,12 @@
         <h1 class="text-xl mb-12">Lista de Fornecedores</h1>
 
         <div class="my-4 flex justify-between">
-            <router-link :to="$route.fullPath + '/create'" class="btn btn-success btn-sm">Adicionar</router-link>
+            <router-link
+            :to="$route.fullPath + '/create' "
+            class="btn btn-success btn-sm">
+                Adicionar
+            </router-link>
+
             <select v-model="ordering"
             @change="listSuppliers()"
             class="select select-sm select-bordered ml-auto mr-4">
@@ -20,7 +25,7 @@
                     v-model="search" >
 
                     <button @click="activePage = 1, listSuppliers()" class="btn btn-square btn-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <font-awesome-icon icon="search" />
                     </button>
                 </div>
             </div>
