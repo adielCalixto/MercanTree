@@ -1,7 +1,7 @@
 <template>
   <div>
     <the-header />
-    <div class="flex overflow-hidden bg-white pt-16">      
+    <div class="flex overflow-hidden bg-base-100 pt-16">      
       <the-sidebar />
       <router-view />
     </div>

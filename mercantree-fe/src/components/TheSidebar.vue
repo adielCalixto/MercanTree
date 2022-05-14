@@ -1,5 +1,5 @@
 <template>
-    <aside class="fixed hidden bg-base z-20 h-full top-0 left-0 pt-16 lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75" aria-label="Sidebar">
+    <aside class="fixed hidden bg-base-200 z-20 h-full top-0 left-0 pt-16 lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75" aria-label="Sidebar">
         <ul class="menu p-2 rounded-box overflow-y-auto">
             <li class="my-1">
                 <router-link to="/">

@@ -14,5 +14,5 @@
 
 .container__child {
     @apply p-2;
-    @apply bg-gray-100;
+    @apply bg-base-200;
 }

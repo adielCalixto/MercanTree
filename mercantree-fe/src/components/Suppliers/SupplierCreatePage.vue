@@ -53,8 +53,8 @@
                 <input v-model="supplier.cnpj" type="text" class="input max-w-md input-sm input-bordered">
             </div>
 
-            <div class="flex justify-end gap-4 bg-gray-100 p-4">
-                <button class="btn btn-secondary btn-sm" @click.prevent="createProduct()">Salvar e adicionar outro</button>
+            <div class="flex justify-end gap-4 bg-base-200 p-4">
+                <button class="btn btn-secondary btn-outline btn-sm" @click.prevent="createProduct()">Salvar e adicionar outro</button>
                 <button class="btn btn-primary btn-sm" @click.prevent="createProduct(true)">Salvar</button>
             </div>
         </form>

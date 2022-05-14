@@ -27,7 +27,7 @@
         </div>
 
         <div v-if="suppliers.count == 0">
-            Nenhum produto encontrado
+            Nenhum fornecedor encontrado
         </div>
 
         <mt-table :table="table" v-else >

@@ -1,6 +1,6 @@
 <template>
     <Suspense>
-        <div class="lg:ml-64 mx-auto container relative overflow-y-hidden overflow-x-auto">
+        <div class="lg:ml-64 mx-auto container max-w-full relative overflow-y-hidden overflow-x-auto">
             <div class="text-sm breadcrumbs mb-4">
                 <ul>
                     <li v-for="i in $route.matched.length - 2">
