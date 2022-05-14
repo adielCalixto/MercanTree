@@ -2,9 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+
+body {
+    @apply h-screen;
+}
+
 .stat-value {
     @apply font-bold;
     @apply text-2xl;
+}
+
+body.sidebar--open .sidebar {
+    @apply flex;
 }
 
 .container {
@@ -15,4 +24,9 @@
 .container__child {
     @apply p-2;
     @apply bg-base-200;
+}
+
+.sidebar__item a {
+    @apply flex;
+    @apply flex-col;
 }

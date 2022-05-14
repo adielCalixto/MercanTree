@@ -1,5 +1,5 @@
 <template>
-  <div class="relative overflow-y-auto lg:ml-64 container max-w-full mx-auto">
+  <div class="relative overflow-y-auto md:ml-48 container max-w-full mx-auto">
     
     <home-stats class="p-2 bg-base-200" />
 
