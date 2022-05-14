@@ -1,5 +1,6 @@
 import decimal
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from django.db.models import Sum
 from .models import Payment, PaymentCharge
 
@@ -27,3 +28,11 @@ class PaymentChargeSerializer(serializers.ModelSerializer):
         model = PaymentCharge
         fields = ('id', 'payment', 'charge', 'created', 'type')
         read_only_fields = ['id', 'created']
+
+
+    def create(self, validated_data):
+        if self.validated_data['payment'].is_paid == True:
+            raise ValidationError({'details': 'Payment is already paid'})
+
+        payment = PaymentCharge.objects.create(**validated_data)
+        return payment

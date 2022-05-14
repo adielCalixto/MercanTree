@@ -1,4 +1,3 @@
-from secrets import choice
 from django.db import models
 
 
@@ -20,3 +19,9 @@ class PaymentCharge(models.Model):
     type = models.CharField(max_length=2, choices=CHARGE_CHOICES)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if self.payment.is_paid == True:
+            return
+        else:
+            super().save(*args, **kwargs)  # Call the "real" save() method.
