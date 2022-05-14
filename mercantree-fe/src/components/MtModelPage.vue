@@ -1,5 +1,5 @@
 <template>
-    <suspense>
+    <Suspense>
         <div class="lg:ml-64 mx-auto container relative overflow-y-hidden overflow-x-auto">
             <div class="text-sm breadcrumbs mb-4">
                 <ul>
@@ -12,20 +12,17 @@
                 </ul>
             </div>
             <router-view />
+
         </div>
-    </suspense>
+        <template #fallback>
+            Loading...
+        </template>
+    </Suspense>
 </template>
 
-<script lang="ts">
-import { defineComponent, Suspense } from "vue"
+<script setup lang="ts">
+
+import { Suspense } from "vue"
 import { RouterView, RouterLink } from "vue-router"
 
-export default defineComponent({
-    name: 'MtModelPage',
-    components: {
-        Suspense,
-        RouterView,
-        RouterLink,
-    },
-})
 </script>

@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 
 import HomeStats from './HomeStats.vue'
 import HomeProductsOverview from './HomeProductsOverview.vue'
