@@ -30,3 +30,7 @@ body.sidebar--open .sidebar {
     @apply flex;
     @apply flex-col;
 }
+
+.sidebar__item a.router-link-active {
+    @apply text-secondary;
+}
