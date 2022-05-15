@@ -4,9 +4,9 @@ import HomePage from '../components/Home/HomePage.vue'
 import Login from '../components/Login/index.vue'
 
 const routes = [
-    { path: '/', component: MtApp, children: [
+    { path: '/', component: MtApp, redirect: '/home', children: [
         {
-            path: '/',
+            path: '/home',
             component: HomePage,
         },
         { 
@@ -67,6 +67,29 @@ const routes = [
                     path: 'supplier/:id',
                     name: 'Alterar fornecedor',
                     component: () => import('../components/Suppliers/SupplierViewPage.vue'),
+                },
+            ] 
+        },
+        { 
+            path: '/cashregister',
+            component: MtModelPage,
+            name: 'Caixa',
+            redirect: '/cashregister',
+            children: [
+                {
+                    path: '',
+                    name: 'Caixa atual',
+                    component: () => import('../components/CashRegister/CashRegPage.vue'),
+                },
+                {
+                    path: 'closed',
+                    name: 'Caixas fechados',
+                    component: () => import('../components/CashRegister/CashRegsClosedPage.vue'),
+                },
+                {
+                    path: 'open',
+                    name: 'Abrir caixa',
+                    component: () => import('../components/CashRegister/CashRegOpenPage.vue'),
                 },
             ] 
         },
