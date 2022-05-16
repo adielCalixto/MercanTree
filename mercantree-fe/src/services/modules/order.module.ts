@@ -24,10 +24,11 @@ class OrderService {
         })
     }
 
-    create({ user, payment }: Order): Promise<Order> {
+    create({ user, payment, products }: Order): Promise<Order> {
         return axios.post('api/orders/', {
             user,
             payment,
+            products,
         })
         .then(response => {
             return Promise.resolve(response.data)
@@ -37,10 +38,11 @@ class OrderService {
         })
     }
 
-    update(id:number, { user, payment }: Order): Promise<Order> {
+    update(id:number, { user, payment, products }: Order): Promise<Order> {
         return axios.put(`api/orders/${id}/`, {
             user,
             payment,
+            products,
         })
         .then(response => {
             return Promise.resolve(response.data)
