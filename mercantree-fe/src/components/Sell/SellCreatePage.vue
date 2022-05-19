@@ -149,7 +149,7 @@
                 order.value = {
                     user: store.id,
                     payment: {
-                        amount: price.value.toFixed(2),
+                        amount: price.value,
                         is_paid: false,
                     },
                     products: products.value.map(p => {

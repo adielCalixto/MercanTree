@@ -24,10 +24,11 @@ class PaymentService {
         })
     }
 
-    create({ amount, is_paid }: Payment): Promise<Payment> {
+    create({ amount, is_paid, type }: Payment): Promise<Payment> {
         return axios.post('api/payments/', {
             amount,
             is_paid,
+            type,
         })
         .then(response => {
             return Promise.resolve(response.data)
@@ -60,9 +61,23 @@ class PaymentService {
         })
     }
 
-    charge(id: number, charge: number): Promise<any> {
-        return axios.post(`api/payments/${id}/charge_amount/`, {
-            charge: charge,
+    deposit(id: number, amount: number, cash_register?: number): Promise<any> {
+        return axios.post(`api/payments/${id}/deposit/`, {
+            amount,
+            cash_register,
+        })
+        .then(response => {
+            return Promise.resolve(response.data)
+        })
+        .catch(error => {
+            return Promise.reject(error)
+        })
+    }
+
+    withdraw(id: number, amount: number, cash_register?: number): Promise<any> {
+        return axios.post(`api/payments/${id}/withdraw/`, {
+            amount,
+            cash_register,
         })
         .then(response => {
             return Promise.resolve(response.data)

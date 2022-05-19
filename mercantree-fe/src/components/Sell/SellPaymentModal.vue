@@ -33,9 +33,10 @@
 
 <script setup lang="ts">
     import { defineEmits, defineProps, computed, ref} from 'vue'
-    import { useRouter } from 'vue-router';
-    import Payment from '../../interfaces/payments/payment.interface';
-    import paymentModule from '../../services/modules/payment.module';
+    import { useRouter } from 'vue-router'
+    import Payment from '../../interfaces/payments/payment.interface'
+    import paymentModule from '../../services/modules/payment.module'
+    import { useStore } from '../../stores/cashregister'
 
     interface Emits {
         (e: 'close'): void
@@ -48,14 +49,16 @@
     const props = defineProps<Props>()
     const emit = defineEmits<Emits>()
     const router = useRouter()
-    const price = computed(() => parseFloat(props.payment.amount))
+    const price = computed(() => props.payment.amount)
     const received = ref(0)
     const back = computed(() => received.value - price.value)
+    const store = useStore()
 
     const payOrder = async () => {
         if(props.payment.id) {
             try {
-                const response = await paymentModule.charge(props.payment.id, (received.value - back.value))
+                const cashRegisterId = store.cashRegister.id ? store.cashRegister.id : undefined
+                const response = await paymentModule.deposit(props.payment.id, (received.value - back.value), cashRegisterId)
                 emit('close')
                 router.push('/sell')
             }

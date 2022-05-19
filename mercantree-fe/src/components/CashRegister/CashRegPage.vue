@@ -1,22 +1,13 @@
 <template>
     <div>
-        <div class="grid grid-cols-2 md:grid-cols-4 w-full my-8 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 w-full my-8 gap-4">
             <div
-            @click="openModal = modalList.CLOSE_CASH_REGISTER"
+            @click="async () => { await store.getStats(), openModal = modalList.CLOSE_CASH_REGISTER }"
             class="btn btn-ghost shadow btn-md">
                 Fechar caixa
                 <font-awesome-icon
                 class="text-lg ml-2"
                 icon="remove" />
-            </div>
-
-            <div
-            @click="openModal = modalList.SHOW_STATS"
-            class="btn btn-ghost shadow btn-md">
-                Ver relatório
-                <font-awesome-icon
-                class="text-lg ml-2"
-                icon="book" />
             </div>
 
             <div
@@ -51,46 +42,28 @@
                     <option value="created">Data-ASC</option>
                     <option value="-created">Data-DESC</option>
                 </select>
-
-                <div class="form-control">
-                    <div class="input-group">
-                        <input
-                        type="text"
-                        placeholder="Search…"
-                        class="input input-sm input-bordered">
-
-                        <button @click="" class="btn btn-square btn-sm">
-                            <font-awesome-icon icon="search" />
-                        </button>
-                    </div>
-                </div>
             </div>
 
-            <div v-if="0">
-                Nenhuma transação encontrado
+            <div v-if="store.transactions.count == 0">
+                Nenhuma transação encontrada
             </div>
 
             <mt-table :table="table" v-else >
-                <tr>
-                    <th>1</th>
-                    <th>12:30</th>
-                    <th>Vazio</th>
-                    <th>Venda</th>
-                    <th>R$200,00</th>
-                    <th>R$0,00</th>
-                    <th>R$200,00</th>
-                    <th></th>
+                <tr v-for="t in store.transactions.results">
+                    <th>{{ t.id }}</th>
+                    <th>{{ transactionDate(t.created ?? '') }}</th>
+                    <th>{{ t.amount }}</th>
+                    <th>{{ transactionType(t.type) }}</th>
+                    <th>
+                        <router-link
+                        class="btn btn-sm"
+                        to="/">
+                            Detalhes
+                            <font-awesome-icon class="ml-2" icon="external-link" />
+                        </router-link>
+                    </th>
                 </tr>
             </mt-table>
-
-            <div class="w-full flex justify-center mt-4">
-                <div class="btn-group">
-                    <button class="btn btn-sm"
-                    v-for="page in pages"
-                    :class="{'btn-active': page == activePage}"
-                    @click="activePage = page">{{ page }}</button>
-                </div>
-            </div>
         </div>
 
         <div>
@@ -100,26 +73,14 @@
                     <h3 class="font-bold text-lg">Adicionar dinheiro ao caixa</h3>
 
                     <div class="modal-action">
-                        <a class="btn btn-primary btn-sm">Salvar</a>
+                        <a @click="depositCash()" class="btn btn-primary btn-sm">Salvar</a>
                         <a @click="openModal = modalList.NONE"
                         class="btn btn-outline btn-error btn-sm">Cancelar</a>
                     </div>
 
                     <div class="divider"></div>
 
-                    <form
-                    class="flex gap-4"
-                    action="#"
-                    method="post">                    
-                        <div class="form-control w-full">
-                            <label class="label">Observações</label>
-                            <textarea
-                            class="textarea textarea-ghost resize-none"
-                            rows="1"
-                            placeholder="Observações">
-                            </textarea>
-                        </div>
-
+                    <div class="flex gap-4 justify-end">
                         <div class="form-control">
                             <label class="label">Valor</label>
                             <input
@@ -127,9 +88,9 @@
                             type="number"
                             name="amount"
                             min="0"
-                            value="0">
+                            v-model="addInput">
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
 
@@ -139,26 +100,14 @@
                     <h3 class="font-bold text-lg">Retirar dinheiro do caixa</h3>
 
                     <div class="modal-action">
-                        <a class="btn btn-primary btn-sm">Salvar</a>
+                        <a @click="removeCash()" class="btn btn-primary btn-sm">Salvar</a>
                         <a @click="openModal=modalList.NONE"
                         class="btn btn-outline btn-error btn-sm">Cancelar</a>
                     </div>
 
                     <div class="divider"></div>
 
-                    <form
-                    class="flex gap-4"
-                    action="#"
-                    method="post">                    
-                        <div class="form-control w-full">
-                            <label class="label">Observações</label>
-                            <textarea
-                            class="textarea textarea-ghost resize-none"
-                            rows="1"
-                            placeholder="Observações">
-                            </textarea>
-                        </div>
-
+                    <div class="flex gap-4 justify-end">
                         <div class="form-control">
                             <label class="label">Valor</label>
                             <input
@@ -166,20 +115,8 @@
                             type="number"
                             name="amount"
                             min="0"
-                            value="0">
+                            v-model="removeInput">
                         </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="modal modal-open"
-            v-if="openModal == modalList.SHOW_STATS">
-                <div class="modal-box max-w-xl">
-                    <h3 class="font-bold text-lg">Detalhes do caixa</h3>
-
-                    <div class="modal-action">
-                        <a @click="openModal=modalList.NONE"
-                        class="btn btn-outline btn-error btn-sm">Cancelar</a>
                     </div>
                 </div>
             </div>
@@ -190,8 +127,41 @@
                     <h3 class="font-bold text-lg">Fechar caixa</h3>
                     <p class="text-md">Tem certeza que deseja fechar o caixa?</p>
 
+                    <div class="my-4 flex gap-4">
+                        <div>
+                            <p class="text text-base-content text-lg">Valor inicial:</p>
+                            <p class="text text-base-content font-bold text-xl">{{ store.stats?.initial_amount }}</p>
+                        </div>
+
+                        <div class="divider divider-horizontal"></div>
+
+                        <div>
+                            <p class="text text-base-content text-lg">Valor estimado final:</p>
+                            <p class="text text-base-content font-bold text-xl">{{ store.stats?.final_amount }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between gap-4">
+                        <div class="form-control flex-1">
+                            <label class="label">Observações:</label>
+                            <textarea
+                            class="textarea textarea-primary resize-none w-full"
+                            rows="1"
+                            v-model="closingForm.details"></textarea>
+                        </div>
+                        <div class="form-control">
+                            <label class="label">Valor em caixa:</label>
+                            <input
+                            class="input input-primary input-sm"
+                            type="number"
+                            v-model="closingForm.closed_amount">
+                        </div>
+                    </div>
+
                     <div class="modal-action">
-                        <a class="btn btn-warning btn-sm">Confirmar</a>
+                        <a @click="close()"
+                        class="btn btn-warning btn-sm">Confirmar</a>
+
                         <a @click="openModal=modalList.NONE"
                         class="btn btn-outline btn-error btn-sm">Cancelar</a>
                     </div>
@@ -199,31 +169,29 @@
             </div>
         </div>
 
-        <div class="warning">
-            <div class="modal modal-open">
-                <div class="modal-box max-w-xl">
-                    <div class="flex gap-2 items-center">
-                        <font-awesome-icon class="text-warning" icon="warning" />
-                        <h3 class="font-bold text-lg">Caixa não aberto</h3>
-                    </div>
+        <div class="modal" :class="{'modal-open': !store.hasCashRegister}">
+            <div class="modal-box max-w-xl">
+                <div class="flex gap-2 items-center">
+                    <font-awesome-icon class="text-warning" icon="warning" />
+                    <h3 class="font-bold text-lg">Caixa não aberto</h3>
+                </div>
 
-                    <p class="text-md">Deseja abrir o caixa?</p>
+                <p class="text-md">Deseja abrir o caixa?</p>
 
-                    <div class="modal-action justify-between mt-12">
-                        <a
-                        class="btn btn-sm btn-ghost"
-                        @click="$router.go(-1)">
-                            <font-awesome-icon class="mr-2" icon="arrow-left" />
-                            Voltar
-                        </a>
+                <div class="modal-action justify-between mt-12">
+                    <a
+                    class="btn btn-sm btn-ghost"
+                    @click="$router.go(-1)">
+                        <font-awesome-icon class="mr-2" icon="arrow-left" />
+                        Voltar
+                    </a>
 
-                        <router-link
-                        class="btn btn-sm btn-ghost"
-                        to="/cashregister/open">
-                            Prosseguir
-                            <font-awesome-icon class="ml-2" icon="external-link" />
-                        </router-link>
-                    </div>
+                    <router-link
+                    class="btn btn-sm btn-ghost"
+                    to="/cashregister/open">
+                        Prosseguir
+                        <font-awesome-icon class="ml-2" icon="external-link" />
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -231,23 +199,46 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue'
-    import { RouterLink } from 'vue-router'
+    import { ref, onMounted } from 'vue'
+    import { RouterLink, useRouter } from 'vue-router'
+    import { useStore } from '../../stores/cashregister'
     import MtTable from '../MtTable.vue'
+    import CashRegisterService from '../../services/modules/cashregister.module'
 
-    const pages = ref(1)
-    const activePage = ref(1)
+    const store = useStore()
+    const router = useRouter()
     const table = {
         name: 'Transações',
         fields: [
             '',
-            'Hora',
-            'Detalhes',
-            'Tipo',
+            'Data',
             'Valor',
-            'Desconto',
-            'Valor Pago',
+            'Tipo',
+            ''
         ]
+    }
+    const addInput = ref(0)
+    const removeInput = ref(0)
+    const closingForm = ref({
+        closed_amount: 0,
+        details: '',
+    })
+
+    const transactionType = (type: string) => {
+        switch(type) {
+            case 'CI':
+                return "Depósito";
+
+            case 'CB':
+                return "Saque"
+
+            default:
+                return "Tipo inválido"
+        }
+    }
+
+    const transactionDate = (date: string) => {
+        return new Date(date).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' })
     }
 
     const openModal = ref('')
@@ -255,8 +246,65 @@
         CLOSE_CASH_REGISTER: 'CCR',
         ADD_CASH: 'ACH',
         REMOVE_CASH: 'RCH',
-        SHOW_STATS: 'SST',
         NONE: '',
+    })
+
+
+    const depositCash = async () => {
+        try {
+            if (!store.cashRegister)
+                return
+
+            if (!store.cashRegister.id)
+                return
+
+            const response = await CashRegisterService.deposit(store.cashRegister.id, addInput.value)
+            openModal.value = modalList.value.NONE
+            store.getTransactions()
+        }
+        catch(e) {
+            console.error(e)
+        }
+    }
+
+    const removeCash = async () => {
+        try {
+            if (!store.cashRegister)
+                return
+
+            if (!store.cashRegister.id)
+                return
+
+            const response = await CashRegisterService.withdraw(store.cashRegister.id, removeInput.value)
+            openModal.value = modalList.value.NONE
+            store.getTransactions()
+        }
+        catch(e) {
+            console.error(e)
+        }
+    }
+
+    const close = async () => {
+        try {
+            store.close(closingForm.value.closed_amount,
+            closingForm.value.details)
+
+            openModal.value = modalList.value.NONE
+            router.push('/')
+        }
+        catch(e) {
+            console.error(e)
+        }
+    }
+
+    onMounted(async () => {
+        try {
+            await store.getCashRegister()
+            await store.getTransactions()
+        }
+        catch(e) {
+            console.error(e)
+        }
     })
 
 </script>

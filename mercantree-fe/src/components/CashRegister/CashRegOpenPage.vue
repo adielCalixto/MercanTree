@@ -7,12 +7,13 @@
             <p class="text-2xl">Abrir o caixa</p>
         </div>
         <div>
-            <form method="POST">
+            <form @submit.prevent="openCashRegister()" method="POST">
                 <div class="flex gap-4 w-full items-center">
                     <label>Valor inicial:</label>
                     <input
                     type="number"
                     min="0"
+                    v-model="amount"
                     class="input input-sm input-primary">
                 </div>
                 <div class="flex gap-4 justify-end mt-8">
@@ -28,7 +29,30 @@
 </template>
 
 <script setup lang="ts">
+    import { ref } from 'vue'
+    import cashregisterModule from '../../services/modules/cashregister.module'
+    import { useStore } from '../../stores/auth'
+    import { useRouter } from 'vue-router'
 
+    const amount = ref(0)
+    const store = useStore()
+    const router = useRouter()
+
+    const openCashRegister = async () => {
+        try {
+            await cashregisterModule.create({
+                details: '',
+                open: true,
+                initial_amount: amount.value,
+                user: store.id,
+            })
+
+            router.push('/cashregister')
+        }
+        catch(e) {
+            console.error(e)
+        }
+    }
 </script>
 
 <style>
