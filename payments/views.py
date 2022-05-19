@@ -1,11 +1,12 @@
 import decimal
-from .models import Payment, PaymentCharge
-from rest_framework import viewsets
+from .models import Payment, Transaction, CashRegister
+from rest_framework import viewsets, serializers
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .serializers import PaymentSerializer, PaymentChargeSerializer
+from .serializers import CashRegisterSerializer, PaymentSerializer, TransactionSerializer
 from django_filters import rest_framework as filters
+from django.db.models import Sum
 from rest_framework.filters import OrderingFilter
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -19,9 +20,10 @@ class PaymentViewSet(viewsets.ModelViewSet):
     filterset_fields = ['is_paid']
     ordering = ['-created']
 
+
     @action(methods=['post'], detail=True)
-    def charge_amount(self, request, pk=None):
-        serializer = PaymentChargeSerializer(data={**request.data, 'payment': pk, 'type': 'CD'})
+    def deposit(self, request, pk=None):
+        serializer = TransactionSerializer(data={**request.data, 'payment': pk, 'type': 'CI'})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -30,10 +32,59 @@ class PaymentViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-@receiver(post_save, sender=PaymentCharge)
+    @action(methods=['post'], detail=True)
+    def withdraw(self, request, pk=None):
+        serializer = TransactionSerializer(data={**request.data, 'payment': pk, 'type': 'CB'})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+class CashRegister(viewsets.ModelViewSet):
+    queryset = CashRegister.objects.all()
+    serializer_class = CashRegisterSerializer
+    permission_classes = [permissions.IsAdminUser]
+    filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
+    ordering = ['-created']
+    filterset_fields = ['open']
+
+    @action(methods=['get'], detail=True)
+    def transactions(self, request, pk=None):
+        transactions = Transaction.objects.filter(cash_register=pk).order_by('-created')
+        page = self.paginate_queryset(transactions)
+
+        if page is not None:
+            serializer = TransactionSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
+
+    
+    @action(methods=['get'], detail=True)
+    def report(self, request, pk=None):
+        cash_register = self.get_object()
+
+        transaction_deposit = Transaction.objects.filter(cash_register=pk, type='CI').aggregate(Sum('amount'))
+        transaction_withdraw = Transaction.objects.filter(cash_register=pk, type='CB').aggregate(Sum('amount'))
+        
+        initial_amount = cash_register.initial_amount
+        final_amount = initial_amount - (transaction_withdraw['amount__sum'] or 0) + (transaction_deposit['amount__sum'] or 0)
+
+        return Response({
+            'initial_amount': initial_amount,
+            'final_amount': final_amount
+        },
+        status=status.HTTP_200_OK)
+
+
+@receiver(post_save, sender=Transaction)
 def check_is_paid(sender, instance=None, created=False, **kwargs):
     # logic to cash_deposit payments
-    if created and instance.type == 'CD':
+    if created and instance.type == 'SL_CH':
         # get payment serializer to access paid_amount
         serializer = PaymentSerializer(instance=instance.payment)
 

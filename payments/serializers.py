@@ -1,8 +1,13 @@
 import decimal
-from rest_framework import serializers
+from rest_framework import serializers, validators
 from rest_framework.exceptions import ValidationError
 from django.db.models import Sum
-from .models import Payment, PaymentCharge
+from .models import CashRegister, Payment, Transaction
+
+
+def field_bigger_than_0(value):
+        if value <= 0:
+            raise serializers.ValidationError('Value should be bigger than 0')
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -11,28 +16,39 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Payment
-        fields = ('id', 'amount', 'is_paid', 'created', 'paid_amount')
+        fields = ('id', 'amount', 'is_paid', 'created', 'paid_amount', 'type')
         read_only_fields = ['id', 'created']
+        extra_kwargs = {
+            'amount': { 'validators': [field_bigger_than_0] }
+        }
 
 
     def get_paid_amount(self, obj):
-        paid = PaymentCharge.objects.filter(payment=obj.id).aggregate(Sum('charge'))
+        paid = Transaction.objects.filter(payment=obj.id).aggregate(Sum('amount'))
 
-        return paid['charge__sum'] if paid['charge__sum'] else decimal.Decimal('0.00')
+        return paid['amount__sum'] if paid['amount__sum'] else decimal.Decimal('0.00')
 
 
-class PaymentChargeSerializer(serializers.ModelSerializer):
+class CashRegisterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CashRegister
+        fields = '__all__'
+        read_only_fields = ['id', 'created', 'updated']
+        extra_kwargs = {
+            'initial_amount': { 'validators': [field_bigger_than_0] },
+            'closed_amount': { 'validators': [field_bigger_than_0] },
+            'open': { 'validators': [validators.UniqueValidator(queryset=CashRegister.objects.filter(open=True))] }
+        }
+
+
+class TransactionSerializer(serializers.ModelSerializer):
     payment = serializers.PrimaryKeyRelatedField(queryset=Payment.objects.all())
 
     class Meta:
-        model = PaymentCharge
-        fields = ('id', 'payment', 'charge', 'created', 'type')
+        model = Transaction
+        fields = ('id', 'payment', 'cash_register', 'amount', 'created', 'type')
         read_only_fields = ['id', 'created']
-
-
-    def create(self, validated_data):
-        if self.validated_data['payment'].is_paid == True:
-            raise ValidationError({'details': 'Payment is already paid'})
-
-        payment = PaymentCharge.objects.create(**validated_data)
-        return payment
+        extra_kwargs = {
+            'amount': { 'validators': [field_bigger_than_0] }
+        }
