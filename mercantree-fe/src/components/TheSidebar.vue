@@ -40,17 +40,10 @@
             <div class="divider"></div>
 
             <li class="sidebar__item">
-                <a>
+                <router-link to="/config">
                     <font-awesome-icon icon="cog" />
                     Configurações
-                </a>
-            </li>
-
-            <li class="sidebar__item">
-                <a>
-                    <font-awesome-icon icon="user" />
-                    Conta
-                </a>
+                </router-link>
             </li>
 
         </ul>

@@ -1,6 +1,7 @@
 import MtApp from '../components/MtApp.vue'
 import MtModelPage from '../components/MtModelPage.vue'
 import HomePage from '../components/Home/HomePage.vue'
+import ConfigPage from '../components/Config/ConfigPage.vue'
 import Login from '../components/Login/index.vue'
 
 const routes = [
@@ -92,6 +93,11 @@ const routes = [
                     component: () => import('../components/CashRegister/CashRegOpenPage.vue'),
                 },
             ] 
+        },
+        { 
+            path: '/config',
+            component: ConfigPage,
+            name: 'Configurações',
         },
     ] },
     { path: '/login', component: Login },

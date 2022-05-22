@@ -29,6 +29,7 @@
     import { Product } from '../../interfaces/products/product.interface'
     import { APIListResponse } from '../../interfaces/common/response.interface';
     import { PAGE_SIZE } from '../../consts'
+    import { useStore as useConfigStore } from '../../stores/config';
     import MtTable from '../MtTable.vue'
 
     interface Props {
@@ -44,6 +45,7 @@
     const emit = defineEmits<Emits>()
     const props = defineProps<Props>()
     const products = ref<APIListResponse<Product>>({ count: 0, results: [] })
+    const configStore = useConfigStore()
     const pages = computed(() => Math.floor((products.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
     const activePage = ref(1)
     const table = {
@@ -65,8 +67,10 @@
             const response = await ProductsService.list(activePage.value, props.search)
             products.value = response
 
-            if(products.value.count == 1) {
-                emit('selected', products.value.results[0])
+            if(configStore.add_product_to_order_when_unique) {
+                if(products.value.count == 1) {
+                    emit('selected', products.value.results[0])
+                }
             }
         }
         catch(e) {
