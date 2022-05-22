@@ -37,12 +37,16 @@
                 <th> {{ product.id }}</th>
                 <th> {{ product.name }} </th>
                 <th> {{ product.description }} </th>
-                <th> {{ product.expires_at }} </th>
+                <th> {{ format_date(product.expires_at) }} </th>
                 <th> {{ product.price }} </th>
                 <th> {{ product.barcode }} </th>
                 <th> {{ product.quantity }} </th>
                 <th> {{ product.category }} </th>
-                <th> {{ product.supplier_id }} </th>
+                <th>
+                    <router-link v-if="product.supplier_id" :to="`/suppliers/supplier/${product.supplier_id}`" class="btn btn-rounded btn-sm">
+                        <font-awesome-icon icon="external-link" />
+                    </router-link>
+                </th>
                 <th>
                     <router-link :to="`/products/product/${product.id}`" class="btn btn-primary btn-sm">View</router-link>
                 </th>
@@ -69,11 +73,15 @@ import { Product } from '../../interfaces/products/product.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { RouterLink } from 'vue-router'
 import { PAGE_SIZE } from '../../consts'
+import format_date from "../../utils/format_date"
 
 export default defineComponent({
     components: {
         MtTable,
         RouterLink,
+    },
+    methods: {
+        format_date,
     },
     async setup() {
         const table = {

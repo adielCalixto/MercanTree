@@ -21,10 +21,13 @@
         <mt-table :table="table" v-else >
             <tr v-for="order in orders.results">
                 <th></th>
-                <th>{{ order.payment.amount }}</th>
-                <th>{{ order.created }}</th>
+                <th>R${{ order.payment.amount }}</th>
+                <th>{{ format_date(order.created ?? '') }}</th>
                 <th>{{ order.status }}</th>
-                <th>{{ order.payment.is_paid }}</th>
+                <th>
+                    <font-awesome-icon class="text-success" v-if="order.payment.is_paid" icon="check" />
+                    <font-awesome-icon class="text-warning" v-else icon="warning" />
+                </th>
                 <th>{{ order.user }}</th>
                 <th>
                     <router-link :to="`/products/product/${order.id}`" class="btn btn-primary btn-sm">View</router-link>
@@ -58,10 +61,14 @@ import OrderService from '../../services/modules/order.module'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { PAGE_SIZE } from '../../consts'
 import { computed } from '@vue/reactivity'
+import format_date from '../../utils/format_date'
 
 export default defineComponent({
     components: {
         MtTable,
+    },
+    methods: {
+        format_date,
     },
     setup() {
         const error = ref()

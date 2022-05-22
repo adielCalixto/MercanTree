@@ -2,22 +2,29 @@
     <div>
         <mt-table :table="table">
             <tr v-for="product in products.results">
-                <th></th>
+                <th>
+                    <button @click="$emit('selected', product)" class="btn btn-sm btn-square">
+                        <font-awesome-icon icon="add" />
+                    </button>
+                </th>
                 <th> {{ product.name }} </th>
                 <th> {{ product.description }} </th>
                 <th> {{ product.price }} </th>
                 <th> {{ product.barcode }} </th>
                 <th> {{ product.quantity }} </th>
+                <th> {{ product.stock_quantity }} </th>
                 <th> {{ product.category }} </th>
-                <th><button @click="$emit('selected', product)" class="btn btn-sm">Selecionar</button></th>
             </tr>
         </mt-table>
-        <button @click="$emit('close')" class="btn btn-sm btn-outline">Close</button>
+        <button @click="$emit('close')" class="btn btn-sm btn-outline mt-4">
+            Close
+            <font-awesome-icon class="ml-2" icon="close" />
+        </button>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { defineComponent, ref, defineProps, computed, defineEmits, onMounted } from 'vue'
+    import { ref, defineProps, computed, defineEmits, onMounted } from 'vue'
     import ProductsService from '../../services/modules/products.module'
     import { Product } from '../../interfaces/products/product.interface'
     import { APIListResponse } from '../../interfaces/common/response.interface';
@@ -48,8 +55,8 @@
             'Preço',
             'Código de barras',
             'Quantidade',
+            'Em estoque',
             'Categoria',
-            '',
         ],
     }
 
@@ -57,6 +64,10 @@
         try {
             const response = await ProductsService.list(activePage.value, props.search)
             products.value = response
+
+            if(products.value.count == 1) {
+                emit('selected', products.value.results[0])
+            }
         }
         catch(e) {
             error.value = e

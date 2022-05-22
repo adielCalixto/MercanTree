@@ -2,10 +2,10 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import axios from './services/axios'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTruck, faUser, faHome, faCashRegister, faCog, faBook, faSearch, faDollar, faBars, faUserCheck, faAdd, faRemove, faExternalLink, faWarning, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faTruck, faUser, faHome, faCashRegister, faCog, faBook, faSearch, faDollar, faBars, faUserCheck, faAdd, faRemove, faExternalLink, faWarning, faArrowLeft, faCheck } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faAdd, faRemove, faExternalLink, faUser, faHome, faCashRegister, faCog, faBook, faSearch, faDollar, faTruck, faBars, faUserCheck, faWarning, faArrowLeft)
+library.add(faAdd, faRemove, faCheck, faExternalLink, faUser, faHome, faCashRegister, faCog, faBook, faSearch, faDollar, faTruck, faBars, faUserCheck, faWarning, faArrowLeft)
 
 import App from './App.vue'
 import './index.css'

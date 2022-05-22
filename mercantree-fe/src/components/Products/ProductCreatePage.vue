@@ -62,8 +62,9 @@
                     <span class="label-text">Fornecedor</span>
                 </label>
                 <select v-model="product.supplier_id" class="select select-sm select-bordered w-full max-w-xs">
-                    <option disabled selected>Fornecedor</option>
-                    <option value="">Exemplo</option>
+                    <option
+                    v-for="s in suppliers.results"
+                    :value="s.id">{{ s.name }}</option>
                 </select>
             </div>
             <div class="flex justify-end gap-4 bg-base-200 p-4">
@@ -76,10 +77,13 @@
 
 <script lang="ts">
 
-import { defineComponent, ref } from "vue"
+import { defineComponent, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
+import { APIListResponse } from "../../interfaces/common/response.interface"
 import { Product } from "../../interfaces/products/product.interface"
+import { Supplier } from "../../interfaces/suppliers/supplier.interface"
 import ProductService from "../../services/modules/products.module"
+import supplierModule from "../../services/modules/supplier.module"
 
 export default defineComponent({
     setup() {
@@ -92,8 +96,9 @@ export default defineComponent({
             supplier_price: 0.0,
             quantity: 0,
             category: '',
-            expires_at: new Date('2022-01-01'),
+            expires_at: '2021-12-01',
         })
+        const suppliers = ref<APIListResponse<Supplier>>({ count: 0, results: [] })
 
         const error = ref()
         const isLoading = ref(false)
@@ -113,11 +118,26 @@ export default defineComponent({
             }
         }
 
+        const getSuppliers = async () => {
+            try {
+                const response = await supplierModule.list()
+                suppliers.value = response
+            }
+            catch(e) {
+                console.error(e)
+            }
+        }
+
+        onMounted(async () => {
+            await getSuppliers()
+        })
+
         return {
             product,
             isLoading,
             error,
             createProduct,
+            suppliers,
         }
     },
 })

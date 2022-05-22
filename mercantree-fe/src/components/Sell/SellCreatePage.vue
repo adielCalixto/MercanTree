@@ -11,8 +11,11 @@
                     </div>
                 </form>
 
-                <div v-if="selectedProduct != undefined">
-                    {{ selectedProduct.name }}
+                <div v-if="selectedProduct != undefined" class="flex flex-col">
+                    <p class="text-xs font-semibold">Selecionado:</p>
+                    <p class="text-md font-bold">
+                        {{ selectedProduct.name }} - R${{ selectedProduct.price }}
+                    </p>
                 </div>
 
                 <div class="flex md:ml-auto">
@@ -33,6 +36,7 @@
                         <th>Produto</th>
                         <th>Quantidade</th>
                         <th>Preço unt.</th>
+                        <th>Preço total</th>
                     </tr>
                 </thead>
                 
@@ -41,7 +45,8 @@
                         <td></td>
                         <td>{{ p.data.name }}</td>
                         <td>{{ p.quantity }}</td>
-                        <td>{{ p.data.price }}</td>
+                        <td>R${{ p.data.price }}</td>
+                        <td>R${{ p.data.price * p.quantity }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -54,23 +59,23 @@
 
             <div class="prices bg-base-200">
                 <div class="bg-base-300 p-4">
-                    <div class="text-xs text-gray-600 flex justify-between">
+                    <div class="text-md text-gray-600 flex justify-between">
                         <p>Subtotal</p>
-                        <p>$40,00</p>
+                        <p>R${{ price }}</p>
                     </div>
 
                     <div class="divider my-1"></div> 
 
-                    <div class="text-xs text-gray-600 flex justify-between">
+                    <div class="text-md text-gray-600 flex justify-between">
                         <p>Desconto</p>
-                        <p>$10,00</p>
+                        <p>$0,00</p>
                     </div>
 
                     <div class="divider my-1"></div> 
 
-                    <div class="text-md text-base-content flex justify-between">
+                    <div class="text-xl font-bold text-base-content flex justify-between">
                         <p>Total    =</p>
-                        <p>${{ price }}</p>
+                        <p>R${{ price }}</p>
                     </div>
                 </div>
             </div>
@@ -88,7 +93,7 @@
 
         <div class="modal modal-open" v-if="paymentModalOpen">
             <div class="modal-box max-w-2xl">
-                <sell-payment-modal v-if="order?.payment" :payment="order?.payment" @close="paymentModalOpen = false" />
+                <sell-payment-modal v-if="order?.payment" :payment="order?.payment" @paid="amount => orderPaid(amount)" @close="paymentModalOpen = false" />
 
                 <div v-else>
                     Loading...
@@ -105,11 +110,12 @@
     import { defineComponent, ref, computed } from 'vue'
     import OrderService from '../../services/modules/order.module'
     import Order from '../../interfaces/orders/order.interface'
-    import OrderProduct from '../../interfaces/orders/order_product.interface'
+    import { OrderStatus } from '../../interfaces/orders/order.interface'
     import { Product } from '../../interfaces/products/product.interface'
     import { useStore } from '../../stores/auth'
     import SellProductsModal from './SellProductsModal.vue'
     import SellPaymentModal from './SellPaymentModal.vue'
+    import { useRouter } from 'vue-router'
 
     interface ProductWithQuantity {
         quantity: number;
@@ -126,6 +132,7 @@
         const quantity = ref(0)
         const error = ref();
         const store = useStore();
+        const router = useRouter();
 
         const selectedProduct = ref<Product>();
         const products = ref<ProductWithQuantity[]>([])
@@ -168,16 +175,48 @@
             }
         }
 
+        const orderPaid = async (amount: number) => {
+            if (!order.value)
+                return
+
+            if (!order.value.id)
+                return
+
+            if(order.value.payment.amount <= amount)
+                order.value.payment.is_paid = true
+
+            order.value.status = OrderStatus.Done
+            try {
+                await OrderService.update(order.value?.id, order.value)
+                router.push('/sell')
+            }
+            catch(e) {
+                console.error(e)
+            }
+        }
+
         const preloadProduct = (p: Product) => {
             selectedProduct.value = p
             createModalOpen.value = false
         }
 
         const addProduct = () => {
-            if(selectedProduct.value != undefined) {
+            if(!selectedProduct.value)
+                return
+
+            if(!selectedProduct.value.id)
+                return
+
+            const result = products.value.findIndex((product) => product.data.id == selectedProduct.value?.id)
+            if(result !== -1) {
+                products.value[result] = {
+                    data: selectedProduct.value,
+                    quantity: quantity.value
+                }
+            } else {
                 products.value.push({
                     data: selectedProduct.value,
-                    quantity: quantity.value,
+                    quantity: quantity.value
                 })
             }
         }
@@ -195,6 +234,7 @@
             quantity,
             products,
             price,
+            orderPaid,
         };
     },
 })

@@ -38,11 +38,12 @@ class OrderService {
         })
     }
 
-    update(id:number, { user, payment, products }: Order): Promise<Order> {
+    update(id:number, { user, payment, products, status }: Order): Promise<Order> {
         return axios.put(`api/orders/${id}/`, {
             user,
             payment,
             products,
+            status,
         })
         .then(response => {
             return Promise.resolve(response.data)
