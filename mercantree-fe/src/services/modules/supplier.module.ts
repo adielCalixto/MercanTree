@@ -1,4 +1,4 @@
-import axios from '../axios'
+import axios from '../../boot/axios'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { Supplier } from '../../interfaces/suppliers/supplier.interface'
 

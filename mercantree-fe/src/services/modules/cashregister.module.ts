@@ -1,4 +1,4 @@
-import axios from '../axios'
+import axios from '../../boot/axios'
 import CashRegister from '../../interfaces/payments/cashregister.interface'
 import Transaction from '../../interfaces/payments/transaction.interface'
 import { PaymentType } from '../../interfaces/payments/payment.interface'

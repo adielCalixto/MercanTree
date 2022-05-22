@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { LoggedUser, LoginUser } from '../interfaces/users/user.interface'
 import authModule from '../services/modules/auth.module'
-import axios from '../services/axios'
+import axios from '../boot/axios'
 
 export const useStore = defineStore('auth', {
     state: ():LoggedUser => {

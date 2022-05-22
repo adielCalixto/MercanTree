@@ -1,4 +1,4 @@
-import axios from '../axios'
+import axios from '../../boot/axios'
 import { LoginUser } from '../../interfaces/users/user.interface';
 
 class AuthService {

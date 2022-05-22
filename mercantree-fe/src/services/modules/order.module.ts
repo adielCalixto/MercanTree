@@ -1,4 +1,4 @@
-import axios from '../axios'
+import axios from '../../boot/axios'
 import Order from '../../interfaces/orders/order.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 
