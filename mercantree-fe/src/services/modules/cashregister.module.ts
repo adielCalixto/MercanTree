@@ -1,6 +1,7 @@
 import axios from '../axios'
 import CashRegister from '../../interfaces/payments/cashregister.interface'
 import Transaction from '../../interfaces/payments/transaction.interface'
+import { PaymentType } from '../../interfaces/payments/payment.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import paymentModule from './payment.module'
 import CashRegisterStats from '../../interfaces/payments/cashregisterstats.interface'
@@ -103,7 +104,7 @@ class CashRegisterService {
 
     deposit(id: number, amount: number): Promise<Transaction> {
         // deposit cash into the cashregister
-        return paymentModule.create({ amount, is_paid: true, type: 'CHRG' })
+        return paymentModule.create({ amount, is_paid: true, type: PaymentType.CashRegisterPayment })
         .then(payment => {
             // try to create a payment and then pass the id to create a transaction
             if (payment.id) {
@@ -127,7 +128,7 @@ class CashRegisterService {
 
     withdraw(id: number, amount: number): Promise<Transaction> {
         // withdraw cash from the cashregister
-        return paymentModule.create({ amount, is_paid: true, type: 'CHRG' })
+        return paymentModule.create({ amount, is_paid: true, type: PaymentType.CashRegisterPayment })
         .then(payment => {
             // try to create a payment and then pass the id to create a transaction
             if (payment.id) {

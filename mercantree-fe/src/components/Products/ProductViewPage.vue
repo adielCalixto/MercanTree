@@ -94,7 +94,7 @@ export default defineComponent({
             barcode: '',
             supplier_id: undefined,
             category: '',
-            expires_at: new Date(),
+            expires_at: '2022-01-01',
             supplier_price: 0.0,
             quantity: 0,
         })
