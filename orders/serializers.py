@@ -69,7 +69,6 @@ class CouponSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(FlexFieldsModelSerializer):
-    status = serializers.SerializerMethodField()
     payment = PaymentSerializer(required=True)
     products = OrderProductSerializer(many=True, required=False)
     coupon = serializers.PrimaryKeyRelatedField(queryset=Coupon.objects.all(), required=False)
@@ -78,10 +77,6 @@ class OrderSerializer(FlexFieldsModelSerializer):
         model = Order
         fields = ['id', 'user', 'created', 'payment', 'status', 'products', 'coupon']
         read_only_fields = ['id', 'created']
-    
-
-    def get_status(self, obj):
-        return obj.get_status()
 
     
     def create(self, validated_data):
@@ -126,6 +121,7 @@ class OrderSerializer(FlexFieldsModelSerializer):
 
         # updating payment
         payment.amount = payment_data.get('amount', payment_data['amount'])
+        payment.is_paid = payment_data.get('is_paid', payment_data['is_paid'])
         payment.save()
 
         # get all OrderProducts that belongs to this order
