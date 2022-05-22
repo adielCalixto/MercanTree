@@ -64,8 +64,9 @@
                     <span class="label-text">Fornecedor</span>
                 </label>
                 <select v-model="product.supplier_id" class="select select-sm select-bordered w-full max-w-xs">
-                    <option disabled selected>Fornecedor</option>
-                    <option value="">Exemplo</option>
+                    <option
+                    v-for="s in suppliers.results"
+                    :value="s.id">{{ s.name }}</option>
                 </select>
             </div>
             <div class="flex justify-end gap-4 bg-base-200 p-4">
@@ -90,6 +91,8 @@ import ProductCategoryModal from "./ProductCategoryModal.vue"
 import { APIListResponse } from "../../interfaces/common/response.interface"
 import Category from "../../interfaces/products/category.interface"
 import categoryService from "../../services/modules/category.module"
+import supplierModule from "../../services/modules/supplier.module"
+import { Supplier } from "../../interfaces/suppliers/supplier.interface"
 
 export default defineComponent({
     components: {
@@ -112,6 +115,7 @@ export default defineComponent({
         })
         const editCategories = ref(false)
         const categories = ref<APIListResponse<Category>>({ count: 0, results: [] })
+        const suppliers = ref<APIListResponse<Supplier>>({ count: 0, results: [] })
 
         const error = ref()
         const isLoading = ref(false)
@@ -156,9 +160,20 @@ export default defineComponent({
             }
         }
 
+        const getSuppliers = async () => {
+            try {
+                const response = await supplierModule.list()
+                suppliers.value = response
+            }
+            catch(e) {
+                console.error(e)
+            }
+        }
+
         onMounted(async () => {
             await getProduct()
             await getCategories()
+            await getSuppliers()
         })
 
         return {
@@ -170,6 +185,7 @@ export default defineComponent({
             categories,
             editCategories,
             getCategories,
+            suppliers,
         }
     },
 })

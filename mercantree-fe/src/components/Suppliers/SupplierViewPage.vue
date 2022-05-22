@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="text-2xl mb-12">Alterar produto</h1>
+        <h1 class="text-2xl mb-12">Alterar fornecedor</h1>
         <h2 class="font-bold text-xl mb-8">{{ supplier.name }}</h2>
 
         <form class="relative" @keydown="(e) => e.key == 'Enter' ? e.preventDefault() : e">
