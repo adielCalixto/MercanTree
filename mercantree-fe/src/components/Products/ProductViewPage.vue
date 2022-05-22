@@ -20,11 +20,14 @@
                 <label class="label">
                     <span class="label-text">Categoria:</span>
                 </label>
-                <select v-model="product.category" class="select select-sm select-bordered w-full max-w-xs">
-                    <option
-                    v-for="c in categories.results"
-                    :value="c.name">{{ c.name }}</option>
-                </select>
+
+                <v-select
+                v-model="product.category"
+                class="w-full max-w-xs"
+                label="name"
+                :reduce="categoryReducer"
+                :options="categories.results" />
+
                 <button type="button" @click="editCategories = true" class="btn btn-sm btn-square">
                     <font-awesome-icon icon="edit" />
                 </button>
@@ -63,11 +66,12 @@
                 <label class="label">
                     <span class="label-text">Fornecedor</span>
                 </label>
-                <select v-model="product.supplier_id" class="select select-sm select-bordered w-full max-w-xs">
-                    <option
-                    v-for="s in suppliers.results"
-                    :value="s.id">{{ s.name }}</option>
-                </select>
+                <v-select
+                v-model="product.supplier_id"
+                class="w-full max-w-xs"
+                label="name"
+                :reduce="supplierReducer"
+                :options="suppliers.results" />
             </div>
             <div class="flex justify-end gap-4 bg-base-200 p-4">
                 <button class="btn btn-error btn-outline btn-sm" @click.prevent="deleteProduct()">Deletar</button>
@@ -170,6 +174,9 @@ export default defineComponent({
             }
         }
 
+        const categoryReducer = (c: Category) => c.name
+        const supplierReducer = (s: Supplier) => s.id
+
         onMounted(async () => {
             await getProduct()
             await getCategories()
@@ -186,6 +193,8 @@ export default defineComponent({
             editCategories,
             getCategories,
             suppliers,
+            categoryReducer,
+            supplierReducer,
         }
     },
 })
