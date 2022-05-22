@@ -21,11 +21,13 @@
                     <span class="label-text">Categoria:</span>
                 </label>
                 <select v-model="product.category" class="select select-sm select-bordered w-full max-w-xs">
-                    <option disabled selected>Categoria</option>
-                    <option value="Grãos">Grãos</option>
-                    <option value="Limpeza">Limpeza</option>
-                    <option value="Outros">Outros</option>
+                    <option
+                    v-for="c in categories.results"
+                    :value="c.name">{{ c.name }}</option>
                 </select>
+                <button type="button" @click="editCategories = true" class="btn btn-sm btn-square">
+                    <font-awesome-icon icon="edit" />
+                </button>
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
@@ -71,18 +73,28 @@
                 <button class="btn btn-secondary btn-sm" @click.prevent="updateProduct()">Salvar</button>
             </div>
         </form>
+
+        <ProductCategoryModal
+        v-if="editCategories"
+        @close="editCategories = false, getCategories()" />
     </div>
 </template>
 
 <script lang="ts">
 
-import { defineComponent, ref } from "vue"
+import { defineComponent, onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import productsService from "../../services/modules/products.module"
 import { Product } from '../../interfaces/products/product.interface'
+import ProductCategoryModal from "./ProductCategoryModal.vue"
+import { APIListResponse } from "../../interfaces/common/response.interface"
+import Category from "../../interfaces/products/category.interface"
+import categoryService from "../../services/modules/category.module"
 
 export default defineComponent({
-    name: 'MtPage',
+    components: {
+        ProductCategoryModal,
+    },
     async setup() {
         const route = useRoute()
         const router = useRouter()
@@ -98,17 +110,21 @@ export default defineComponent({
             supplier_price: 0.0,
             quantity: 0,
         })
+        const editCategories = ref(false)
+        const categories = ref<APIListResponse<Category>>({ count: 0, results: [] })
 
         const error = ref()
         const isLoading = ref(false)
 
-        try {
-            isLoading.value = true
-            const response = await productsService.retrieve(id)
-            product.value = response
-            isLoading.value = false
-        } catch(e) {
-            router.push('/products')
+        const getProduct = async () => {
+            try {
+                isLoading.value = true
+                const response = await productsService.retrieve(id)
+                product.value = response
+                isLoading.value = false
+            } catch(e) {
+                router.push('/products')
+            }
         }
 
         const updateProduct = async () => {
@@ -130,12 +146,30 @@ export default defineComponent({
             }
         }
 
+        const getCategories = async () => {
+            try {
+                const response = await categoryService().list()
+                categories.value = response
+            }
+            catch(e) {
+                console.error(e)
+            }
+        }
+
+        onMounted(async () => {
+            await getProduct()
+            await getCategories()
+        })
+
         return {
             product,
             error,
             isLoading,
             updateProduct,
             deleteProduct,
+            categories,
+            editCategories,
+            getCategories,
         }
     },
 })

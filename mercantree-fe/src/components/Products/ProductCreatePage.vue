@@ -21,11 +21,13 @@
                     <span class="label-text">Categoria:</span>
                 </label>
                 <select v-model="product.category" class="select select-sm select-bordered w-full max-w-xs">
-                    <option disabled selected>Categoria</option>
-                    <option value="Grãos">Grãos</option>
-                    <option value="Limpeza">Limpeza</option>
-                    <option value="Outros">Outros</option>
+                    <option
+                    v-for="c in categories.results"
+                    :value="c.name">{{ c.name }}</option>
                 </select>
+                <button type="button" @click="editCategories = true" class="btn btn-sm btn-square">
+                    <font-awesome-icon icon="edit" />
+                </button>
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
@@ -72,6 +74,10 @@
                 <button class="btn btn-primary btn-sm" @click.prevent="createProduct(true)">Salvar</button>
             </div>
         </form>
+
+        <ProductCategoryModal
+        v-if="editCategories"
+        @close="editCategories = false, getCategories()" />
     </div>
 </template>
 
@@ -80,12 +86,18 @@
 import { defineComponent, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import { APIListResponse } from "../../interfaces/common/response.interface"
+import Category from "../../interfaces/products/category.interface"
 import { Product } from "../../interfaces/products/product.interface"
 import { Supplier } from "../../interfaces/suppliers/supplier.interface"
+import categoryService from "../../services/modules/category.module"
 import ProductService from "../../services/modules/products.module"
 import supplierModule from "../../services/modules/supplier.module"
+import ProductCategoryModal from "./ProductCategoryModal.vue"
 
 export default defineComponent({
+    components: {
+        ProductCategoryModal,
+    },
     setup() {
         const product = ref<Product>({
             name: '',
@@ -99,10 +111,11 @@ export default defineComponent({
             expires_at: '2021-12-01',
         })
         const suppliers = ref<APIListResponse<Supplier>>({ count: 0, results: [] })
-
+        const categories = ref<APIListResponse<Category>>({ count: 0, results: [] })
         const error = ref()
         const isLoading = ref(false)
         const router = useRouter()
+        const editCategories = ref(false)
 
         const createProduct = async (redirect: boolean = false) => {
             try {
@@ -128,8 +141,19 @@ export default defineComponent({
             }
         }
 
+        const getCategories = async () => {
+            try {
+                const response = await categoryService().list()
+                categories.value = response
+            }
+            catch(e) {
+                console.error(e)
+            }
+        }
+
         onMounted(async () => {
             await getSuppliers()
+            await getCategories()
         })
 
         return {
@@ -138,6 +162,9 @@ export default defineComponent({
             error,
             createProduct,
             suppliers,
+            editCategories,
+            categories,
+            getCategories,
         }
     },
 })
