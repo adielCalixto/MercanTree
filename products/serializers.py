@@ -6,7 +6,7 @@ from orders.models import OrderProduct
 
 class ProductSerializer(serializers.ModelSerializer):
     stock_quantity = serializers.SerializerMethodField()
-    category = serializers.SlugRelatedField('name', queryset=Category.objects.all())
+    category = serializers.SlugRelatedField('name', queryset=Category.objects.all(), allow_null=True)
 
     class Meta:
         model = Product
