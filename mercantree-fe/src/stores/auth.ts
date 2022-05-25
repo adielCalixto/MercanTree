@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { LoggedUser, LoginUser } from '../interfaces/users/user.interface'
-import authModule from '../services/modules/auth.module'
+import authService from '../services/authService'
 import axios from '../boot/axios'
 
 export const useStore = defineStore('auth', {
@@ -13,7 +13,7 @@ export const useStore = defineStore('auth', {
     },
     actions: {
         async loginUser(user: LoginUser) {
-            return authModule.login({ username: user.username, password: user.password })
+            return authService.login({ username: user.username, password: user.password })
             .then(response => {
                 this.token = response.token
                 this.username = response.user_name

@@ -201,9 +201,9 @@
 <script setup lang="ts">
     import { ref, onMounted } from 'vue'
     import { RouterLink, useRouter } from 'vue-router'
+    import CashRegisterService from '../../services/cashRegisterService';
     import { useStore } from '../../stores/cashregister'
     import MtTable from '../MtTable.vue'
-    import CashRegisterService from '../../services/modules/cashregister.module'
 
     const store = useStore()
     const router = useRouter()
@@ -258,7 +258,7 @@
             if (!store.cashRegister.id)
                 return
 
-            const response = await CashRegisterService.deposit(store.cashRegister.id, addInput.value)
+            const response = await CashRegisterService().deposit(store.cashRegister.id, addInput.value)
             openModal.value = modalList.value.NONE
             store.getTransactions()
         }
@@ -275,7 +275,7 @@
             if (!store.cashRegister.id)
                 return
 
-            const response = await CashRegisterService.withdraw(store.cashRegister.id, removeInput.value)
+            const response = await CashRegisterService().withdraw(store.cashRegister.id, removeInput.value)
             openModal.value = modalList.value.NONE
             store.getTransactions()
         }
@@ -286,7 +286,7 @@
 
     const close = async () => {
         try {
-            store.close(closingForm.value.closed_amount,
+            await store.close(closingForm.value.closed_amount,
             closingForm.value.details)
 
             openModal.value = modalList.value.NONE

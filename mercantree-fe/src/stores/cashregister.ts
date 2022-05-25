@@ -3,7 +3,7 @@ import { APIListResponse } from '../interfaces/common/response.interface';
 import CashRegister from '../interfaces/payments/cashregister.interface'
 import CashRegisterStats from '../interfaces/payments/cashregisterstats.interface';
 import Transaction from '../interfaces/payments/transaction.interface';
-import CashRegisterService from '../services/modules/cashregister.module'
+import CashRegisterService from '../services/cashRegisterService'
 
 interface CashRegisterStore {
     cashRegister: CashRegister;
@@ -36,7 +36,7 @@ export const useStore = defineStore('cashregister', {
             if (!this.cashRegister.id)
                 return
 
-            return CashRegisterService.transactions(this.cashRegister.id)
+            return CashRegisterService().transactions(this.cashRegister.id)
             .then(response => {
                 this.transactions = response
             })
@@ -46,7 +46,7 @@ export const useStore = defineStore('cashregister', {
         },
 
         getCashRegister() {
-            return CashRegisterService.list(1, true)
+            return CashRegisterService().getOpen()
             .then(response => {
                 if (response.count > 0) {
                     this.hasCashRegister = true
@@ -63,7 +63,7 @@ export const useStore = defineStore('cashregister', {
             if (!this.cashRegister.id)
                 return;
 
-            return CashRegisterService.report(this.cashRegister.id)
+            return CashRegisterService().report(this.cashRegister.id)
             .then(response => {
                 this.stats = response
                 return Promise.resolve()
@@ -77,7 +77,7 @@ export const useStore = defineStore('cashregister', {
             if (!this.cashRegister.id)
                 return
     
-            return CashRegisterService.close(this.cashRegister.id, closed_amount, details)
+            return CashRegisterService().close(this.cashRegister.id, closed_amount, details)
             .then(() => {
                 this.$reset()
                 return Promise.resolve()

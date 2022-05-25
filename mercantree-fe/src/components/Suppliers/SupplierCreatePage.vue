@@ -63,10 +63,11 @@
 
 <script lang="ts">
 
+import swal from "sweetalert"
 import { defineComponent, ref } from "vue"
 import { useRouter } from "vue-router"
-import SupplierService from "../../services/modules/supplier.module"
 import { Supplier } from "../../interfaces/suppliers/supplier.interface"
+import SupplierService from "../../services/supplierService"
 
 export default defineComponent({
     setup() {
@@ -87,8 +88,10 @@ export default defineComponent({
         const createProduct = async (redirect: boolean = false) => {
             try {
                 isLoading.value = true
-                const response = await SupplierService.create(supplier.value)
+                const response = await SupplierService().create(supplier.value)
                 isLoading.value = false
+
+                await swal('Sucesso', 'Fornecedor criado', 'success')
 
                 if(redirect) {
                     router.push('/suppliers')

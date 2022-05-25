@@ -57,11 +57,11 @@
 import MtTable from '../MtTable.vue'
 import { defineComponent, ref, onBeforeMount } from 'vue'
 import Order from '../../interfaces/orders/order.interface'
-import OrderService from '../../services/modules/order.module'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { PAGE_SIZE } from '../../consts'
 import { computed } from '@vue/reactivity'
 import format_date from '../../utils/format_date'
+import OrderService from '../../services/orderService'
 
 export default defineComponent({
     components: {
@@ -94,7 +94,7 @@ export default defineComponent({
         const listOrders = async () => {
             try {
                 isLoading.value = true
-                const response = await OrderService.list(activePage.value, '', ordering.value)
+                const response = await OrderService().list(activePage.value, '', ordering.value)
                 isLoading.value = false
 
                 orders.value = response

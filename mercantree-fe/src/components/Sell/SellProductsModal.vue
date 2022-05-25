@@ -25,12 +25,12 @@
 
 <script setup lang="ts">
     import { ref, defineProps, computed, defineEmits, onMounted } from 'vue'
-    import ProductsService from '../../services/modules/products.module'
     import { Product } from '../../interfaces/products/product.interface'
     import { APIListResponse } from '../../interfaces/common/response.interface';
     import { PAGE_SIZE } from '../../consts'
     import { useStore as useConfigStore } from '../../stores/config';
     import MtTable from '../MtTable.vue'
+    import ProductService from '../../services/productService';
 
     interface Props {
         search: string;
@@ -64,7 +64,7 @@
 
     const listProducts = async () => {
         try {
-            const response = await ProductsService.list(activePage.value, props.search)
+            const response = await ProductService().list(activePage.value, props.search)
             products.value = response
 
             if(configStore.add_product_to_order_when_unique) {

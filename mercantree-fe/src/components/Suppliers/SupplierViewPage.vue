@@ -62,10 +62,11 @@
 
 <script lang="ts">
 
+import swal from "sweetalert"
 import { defineComponent, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import SupplierService from "../../services/modules/supplier.module"
 import { Supplier } from "../../interfaces/suppliers/supplier.interface"
+import SupplierService from "../../services/supplierService"
 
 export default defineComponent({
     name: 'MtPage',
@@ -88,7 +89,7 @@ export default defineComponent({
 
         try {
             isLoading.value = true
-            const response = await SupplierService.retrieve(id)
+            const response = await SupplierService().retrieve(id)
             supplier.value = response
             isLoading.value = false
         } catch(e) {
@@ -97,8 +98,11 @@ export default defineComponent({
 
         const updateProduct = async () => {
             try {
-                const response = await SupplierService.update(id, supplier.value)
+                const response = await SupplierService().update(id, supplier.value)
                 supplier.value = response
+
+                await swal('Sucesso', 'Fornecedor editado', 'success')
+
                 router.push('/suppliers')
             } catch(e) {
                 error.value = e
@@ -107,7 +111,10 @@ export default defineComponent({
 
         const deleteProduct = async () => {
             try {
-                const response = await SupplierService.destroy(id)
+                const response = await SupplierService().destroy(id)
+
+                await swal('Sucesso', 'Fornecedor deletado', 'success')
+
                 router.push('/suppliers')
             } catch(e) {
                 error.value = e

@@ -89,14 +89,15 @@
 
 import { defineComponent, onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import productsService from "../../services/modules/products.module"
+import productsService from "../../services/productService"
 import { Product } from '../../interfaces/products/product.interface'
 import ProductCategoryModal from "./ProductCategoryModal.vue"
 import { APIListResponse } from "../../interfaces/common/response.interface"
 import Category from "../../interfaces/products/category.interface"
-import categoryService from "../../services/modules/category.module"
-import supplierModule from "../../services/modules/supplier.module"
 import { Supplier } from "../../interfaces/suppliers/supplier.interface"
+import categoryService from "../../services/categoryService"
+import SupplierService from "../../services/supplierService"
+import swal from "sweetalert"
 
 export default defineComponent({
     components: {
@@ -127,7 +128,7 @@ export default defineComponent({
         const getProduct = async () => {
             try {
                 isLoading.value = true
-                const response = await productsService.retrieve(id)
+                const response = await productsService().retrieve(id)
                 product.value = response
                 isLoading.value = false
             } catch(e) {
@@ -137,8 +138,11 @@ export default defineComponent({
 
         const updateProduct = async () => {
             try {
-                const response = await productsService.update(id, product.value)
+                const response = await productsService().update(id, product.value)
                 product.value = response
+                
+                await swal('Sucesso', 'Produto editado', 'success')
+
                 router.push('/products')
             } catch(e) {
                 error.value = e
@@ -147,7 +151,10 @@ export default defineComponent({
 
         const deleteProduct = async () => {
             try {
-                const response = await productsService.destroy(id)
+                const response = await productsService().destroy(id)
+
+                await swal('Sucesso', 'Produto deletado', 'success')
+
                 router.push('/products')
             } catch(e) {
                 error.value = e
@@ -166,7 +173,7 @@ export default defineComponent({
 
         const getSuppliers = async () => {
             try {
-                const response = await supplierModule.list()
+                const response = await SupplierService().list()
                 suppliers.value = response
             }
             catch(e) {

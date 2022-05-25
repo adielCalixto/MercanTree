@@ -73,10 +73,12 @@
 
 <script setup lang="ts">
 import { defineEmits, onMounted, reactive, ref, nextTick } from 'vue'
-import { APIListResponse } from '../../interfaces/common/response.interface';
-import Category from '../../interfaces/products/category.interface';
-import categoryService from '../../services/modules/category.module';
+import { APIListResponse } from '../../interfaces/common/response.interface'
+import Category from '../../interfaces/products/category.interface'
+import categoryService from '../../services/categoryService'
 import MtTable from '../MtTable.vue'
+import swal from 'sweetalert'
+import errorService from '../../services/errorService'
 
 interface Emits {
     (e: 'close'): void;
@@ -120,6 +122,13 @@ const addCategory = async () => {
             return
 
         await categoryService().create({name: states.name})
+
+        swal({
+                title: 'Sucesso',
+                text: 'Categoria criada',
+                icon: 'success'
+            })
+
         getCategories()
     }
     catch(e) {
@@ -129,15 +138,22 @@ const addCategory = async () => {
 
 const deleteCategory = async (id?: number) => {
     try {
-        if (!id)
-            return
+        if (!id) return
 
-        if (!confirm('Não é possível reverter. Tem certeza?')) {
-            return
-        }
+        errorService().onWarn()
+        .then(async () => {
+            await categoryService().destroy(id)
+            getCategories()
 
-        await categoryService().destroy(id)
-        getCategories()
+            swal({
+                title: 'Sucesso',
+                text: 'Categoria deletada',
+                icon: 'success'
+            })
+        })
+        .catch(() => {
+            return
+        })
     }
     catch(e) {
         console.error(e)
@@ -154,6 +170,12 @@ const editCategory = async (id?:number) => {
             await categoryService().update(id, { name: states.editingFields[id].value })
             states.editingFieldId = undefined
             await getCategories()
+
+            swal({
+                title: 'Sucesso',
+                text: 'Categoria editada',
+                icon: 'success'
+            })
         }
     }
     catch(e) {

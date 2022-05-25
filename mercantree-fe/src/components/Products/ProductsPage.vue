@@ -68,7 +68,7 @@
 
 import { defineComponent, ref, computed, onBeforeMount } from 'vue'
 import MtTable from "../MtTable.vue"
-import ProductService from '../../services/modules/products.module'
+import ProductService from '../../services/productService'
 import { Product } from '../../interfaces/products/product.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { RouterLink } from 'vue-router'
@@ -111,7 +111,7 @@ export default defineComponent({
         const listProducts = async () => {
             try {
                 isLoading.value = true
-                const response = await ProductService.list(activePage.value, search.value, ordering.value)
+                const response = await ProductService().list(activePage.value, search.value, ordering.value)
                 products.value = response
                 isLoading.value = false
             } catch(e) {

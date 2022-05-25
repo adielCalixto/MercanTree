@@ -88,15 +88,16 @@
 
 <script lang="ts">
 
+import swal from "sweetalert"
 import { defineComponent, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import { APIListResponse } from "../../interfaces/common/response.interface"
 import Category from "../../interfaces/products/category.interface"
 import { Product } from "../../interfaces/products/product.interface"
 import { Supplier } from "../../interfaces/suppliers/supplier.interface"
-import categoryService from "../../services/modules/category.module"
-import ProductService from "../../services/modules/products.module"
-import supplierModule from "../../services/modules/supplier.module"
+import categoryService from "../../services/categoryService"
+import ProductService from "../../services/productService"
+import supplierModule from "../../services/supplierService"
 import ProductCategoryModal from "./ProductCategoryModal.vue"
 
 export default defineComponent({
@@ -125,8 +126,10 @@ export default defineComponent({
         const createProduct = async (redirect: boolean = false) => {
             try {
                 isLoading.value = true
-                const response = await ProductService.create(product.value)
+                const response = await ProductService().create(product.value)
                 isLoading.value = false
+
+                await swal('Sucesso', 'Produto criado', 'success')
 
                 if(redirect) {
                     router.push('/products')
@@ -138,7 +141,7 @@ export default defineComponent({
 
         const getSuppliers = async () => {
             try {
-                const response = await supplierModule.list()
+                const response = await supplierModule().list()
                 suppliers.value = response
             }
             catch(e) {

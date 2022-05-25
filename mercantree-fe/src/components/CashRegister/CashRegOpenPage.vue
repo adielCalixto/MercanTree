@@ -30,9 +30,9 @@
 
 <script setup lang="ts">
     import { ref } from 'vue'
-    import cashregisterModule from '../../services/modules/cashregister.module'
     import { useStore } from '../../stores/auth'
     import { useRouter } from 'vue-router'
+import CashRegisterService from '../../services/cashRegisterService';
 
     const amount = ref(0)
     const store = useStore()
@@ -40,7 +40,7 @@
 
     const openCashRegister = async () => {
         try {
-            await cashregisterModule.create({
+            await CashRegisterService().create({
                 details: '',
                 open: true,
                 initial_amount: amount.value,

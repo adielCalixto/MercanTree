@@ -1,5 +1,6 @@
-import axios from '../../boot/axios'
-import { LoginUser } from '../../interfaces/users/user.interface';
+import axios from '../boot/axios'
+import { LoginUser } from '../interfaces/users/user.interface';
+import errorService from './errorService';
 
 class AuthService {
   login(user: LoginUser) {
@@ -12,6 +13,7 @@ class AuthService {
         return Promise.resolve(response.data);
       })
       .catch(error => {
+        errorService().onError(error)
         return Promise.reject(error);
       })
   }

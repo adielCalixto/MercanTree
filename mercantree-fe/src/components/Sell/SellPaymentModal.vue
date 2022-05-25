@@ -34,7 +34,7 @@
 <script setup lang="ts">
     import { defineEmits, defineProps, computed, ref} from 'vue'
     import Payment from '../../interfaces/payments/payment.interface'
-    import paymentModule from '../../services/modules/payment.module'
+    import PaymentService from '../../services/paymentService';
     import { useStore } from '../../stores/cashregister'
 
     interface Emits {
@@ -57,8 +57,9 @@
     const payOrder = async () => {
         if(props.payment.id) {
             try {
+                await store.getCashRegister()
                 const cashRegisterId = store.cashRegister.id ? store.cashRegister.id : undefined
-                await paymentModule.deposit(props.payment.id, paidAmount.value, cashRegisterId)
+                await PaymentService().deposit(props.payment.id, paidAmount.value, cashRegisterId)
                 emit('paid', paidAmount.value)
             }
             catch(e) {

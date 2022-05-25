@@ -69,8 +69,8 @@ import MtTable from "../MtTable.vue"
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { RouterLink } from 'vue-router'
 import { Supplier } from '../../interfaces/suppliers/supplier.interface'
-import SupplierService from '../../services/modules/supplier.module'
 import { PAGE_SIZE } from '../../consts'
+import SupplierService from '../../services/supplierService'
 
 export default defineComponent({
     components: {
@@ -104,7 +104,7 @@ export default defineComponent({
         const listSuppliers = async () => {
             try {
                 isLoading.value = true
-                const response = await SupplierService.list(activePage.value, search.value, ordering.value)
+                const response = await SupplierService().list(activePage.value, search.value, ordering.value)
                 suppliers.value = response
                 isLoading.value = false
             } catch(e) {

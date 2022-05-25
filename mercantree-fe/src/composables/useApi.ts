@@ -1,5 +1,6 @@
 import axios from '../boot/axios'
 import { APIListResponse } from '../interfaces/common/response.interface'
+import errorService from '../services/errorService'
 
 export default function useApi<T>(url: string) {
     const list = async (page: number = 1, search: string = '', ordering: string ='' ): Promise<APIListResponse<T>> => {
@@ -8,6 +9,7 @@ export default function useApi<T>(url: string) {
             return Promise.resolve(response.data)
         })
         .catch(error => {
+            errorService().onError(error)
             return Promise.reject(error)
         })
     }
@@ -18,6 +20,7 @@ export default function useApi<T>(url: string) {
             return Promise.resolve(response.data)
         })
         .catch(error => {
+            errorService().onError(error)
             return Promise.reject(error)
         })
     }
@@ -28,6 +31,7 @@ export default function useApi<T>(url: string) {
             return Promise.resolve(response.data)
         })
         .catch(error => {
+            errorService().onError(error)
             return Promise.reject(error)
         })
     }
@@ -38,6 +42,7 @@ export default function useApi<T>(url: string) {
             return Promise.resolve(response.data)
         })
         .catch(error => {
+            errorService().onError(error)
             return Promise.reject(error)
         })
     }
@@ -48,6 +53,7 @@ export default function useApi<T>(url: string) {
             return Promise.resolve(response.statusText)
         })
         .catch(error => {
+            errorService().onError(error)
             return Promise.reject(error)
         })
     }

@@ -82,7 +82,7 @@
         </div>
 
         <div class="bg-base-200 p-2 flex justify-end">
-            <button @click="saveOrder(), paymentModalOpen = true" class="btn btn-sm btn-error btn-outline">Pagar</button>
+            <button @click="saveOrder()" class="btn btn-sm btn-error btn-outline">Pagar</button>
         </div>
 
         <div class="modal modal-open" v-if="createModalOpen">
@@ -108,7 +108,6 @@
 
 <script lang="ts">
     import { defineComponent, ref, computed } from 'vue'
-    import OrderService from '../../services/modules/order.module'
     import Order from '../../interfaces/orders/order.interface'
     import { OrderStatus } from '../../interfaces/orders/order.interface'
     import { Product } from '../../interfaces/products/product.interface'
@@ -116,6 +115,7 @@
     import SellProductsModal from './SellProductsModal.vue'
     import SellPaymentModal from './SellPaymentModal.vue'
     import { useRouter } from 'vue-router'
+    import OrderService from '../../services/orderService'
 
     interface ProductWithQuantity {
         quantity: number;
@@ -150,8 +150,9 @@
 
         const saveOrder = async () => {
             try {
-                if(!store.id)
-                    return
+                if(!store.id) return
+
+                if (order?.value?.id) return
 
                 order.value = {
                     user: store.id,
@@ -167,8 +168,10 @@
                     })
                 }
 
-                const response = await OrderService.create(order.value)
+                const response = await OrderService().create(order.value)
                 order.value = response
+
+                paymentModalOpen.value = true
             }
             catch (e) {
                 error.value = e;
@@ -186,8 +189,10 @@
                 order.value.payment.is_paid = true
 
             order.value.status = OrderStatus.Done
+            delete order.value.coupon
+
             try {
-                await OrderService.update(order.value?.id, order.value)
+                await OrderService().update(order.value?.id, order.value)
                 router.push('/sell')
             }
             catch(e) {
