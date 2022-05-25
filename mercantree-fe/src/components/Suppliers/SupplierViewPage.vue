@@ -52,7 +52,7 @@
                 </label>
                 <input v-model="supplier.cnpj" type="text" class="input max-w-md input-sm input-bordered">
             </div>
-            <div class="flex justify-end gap-4 my-4 bg-gray-100 p-4">
+            <div class="flex justify-end gap-4 my-4 bg-base-200 p-4">
                 <button class="btn btn-error btn-outline btn-sm" @click.prevent="deleteProduct()">Deletar</button>
                 <button class="btn btn-secondary btn-sm" @click.prevent="updateProduct()">Salvar</button>
             </div>

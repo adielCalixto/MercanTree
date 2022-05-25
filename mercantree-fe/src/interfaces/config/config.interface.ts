@@ -1,6 +1,6 @@
 enum Theme {
     'DARK' = 'business',
-    'LIGHT' = 'corporate'
+    'LIGHT' = 'mercantree'
 }
 
 interface Config {
