@@ -63,13 +63,13 @@ export default function CashRegisterService() {
         })
     }
 
-    const deposit = async (id: number, amount: number): Promise<Transaction> => {
+    const deposit = async (id: number, amount: number, details: string): Promise<Transaction> => {
         // deposit cash into the cashregister
-        return PaymentService().create({ amount, is_paid: true, type: PaymentType.CashRegisterPayment })
+        return PaymentService().create({ amount: amount.toFixed(2), is_paid: true, type: PaymentType.CashRegisterPayment })
         .then(payment => {
             // try to create a payment and then pass the id to create a transaction
             if (payment.id) {
-                return PaymentService().deposit(payment.id, amount, id)
+                return PaymentService().deposit(payment.id, amount, id, details)
                 .then(transaction => {
                     // transaction created, return the data
                     return Promise.resolve(transaction.data)
@@ -91,13 +91,13 @@ export default function CashRegisterService() {
         })
     }
 
-    const withdraw = async (id: number, amount: number): Promise<Transaction> => {
+    const withdraw = async (id: number, amount: number, details: string): Promise<Transaction> => {
         // withdraw cash from the cashregister
-        return PaymentService().create({ amount, is_paid: true, type: PaymentType.CashRegisterPayment })
+        return PaymentService().create({ amount: amount.toFixed(2), is_paid: true, type: PaymentType.CashRegisterPayment })
         .then(payment => {
             // try to create a payment and then pass the id to create a transaction
             if (payment.id) {
-                return PaymentService().withdraw(payment.id, amount, id)
+                return PaymentService().withdraw(payment.id, amount, id, details)
                 .then(transaction => {
                     // transaction created, return the data
                     return Promise.resolve(transaction.data)

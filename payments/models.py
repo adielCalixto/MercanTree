@@ -41,6 +41,7 @@ class Transaction(models.Model):
     type = models.CharField(max_length=2, choices=Type.choices, default=Type.CASH)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    details = models.TextField(null=True, blank=True)
 
     def get_type(self):
         return self.Type(self.type).label

@@ -5,7 +5,7 @@ enum PaymentType {
 
 
 interface Payment {
-    amount: number;
+    amount: string;
     is_paid: boolean;
     paid_amount?: string;
     id?: number;

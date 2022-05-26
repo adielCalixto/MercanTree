@@ -52,6 +52,12 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
+                    <span class="label-text">Quantidade em estoque:</span>
+                </label>
+                <input v-model="product.stock_quantity" readonly type="text" class="input max-w-md input-sm input-bordered">
+            </div>
+            <div class="flex gap-4 w-full my-4">
+                <label class="label">
                     <span class="label-text">Validade:</span>
                 </label>
                 <input v-model="product.expires_at" type="date" class="input max-w-md input-sm input-bordered">
@@ -110,7 +116,7 @@ export default defineComponent({
         const product = ref<Product>({
             name: '',
             description: '',
-            price: 0,
+            price: '0.00',
             barcode: '',
             supplier_id: undefined,
             category: '',

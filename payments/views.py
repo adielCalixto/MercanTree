@@ -75,8 +75,8 @@ class CashRegister(viewsets.ModelViewSet):
         final_amount = initial_amount - (transaction_withdraw['amount__sum'] or 0) + (transaction_deposit['amount__sum'] or 0)
 
         return Response({
-            'initial_amount': initial_amount,
-            'final_amount': final_amount
+            'initial_amount': str(initial_amount),
+            'final_amount': str(final_amount)
         },
         status=status.HTTP_200_OK)
 
@@ -84,11 +84,11 @@ class CashRegister(viewsets.ModelViewSet):
 @receiver(post_save, sender=Transaction)
 def check_is_paid(sender, instance=None, created=False, **kwargs):
     # logic to cash_deposit payments
-    if created and instance.type == 'SL_CH':
+    if created and instance.type == 'CI':
         # get payment serializer to access paid_amount
         serializer = PaymentSerializer(instance=instance.payment)
 
-        # if paid_amount is equal to or bigger than the payment amount, set it as pais
+        # if paid_amount is equal to or bigger than the payment amount, set it as paid
         if decimal.Decimal(serializer.data.get('amount')) <= decimal.Decimal(serializer.data.get('paid_amount')):
             serializer = PaymentSerializer(instance=instance.payment, data={'is_paid': True}, partial=True)
             serializer.is_valid(raise_exception=True)

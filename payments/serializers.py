@@ -26,7 +26,7 @@ class PaymentSerializer(serializers.ModelSerializer):
     def get_paid_amount(self, obj):
         paid = Transaction.objects.filter(payment=obj.id).aggregate(Sum('amount'))
 
-        return paid['amount__sum'] if paid['amount__sum'] else decimal.Decimal('0.00')
+        return str(paid['amount__sum'] if paid['amount__sum'] else decimal.Decimal())
 
 
 class CashRegisterSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ('id', 'payment', 'cash_register', 'amount', 'created', 'type')
+        fields = ('id', 'payment', 'cash_register', 'amount', 'created', 'type', 'details')
         read_only_fields = ['id', 'created']
         extra_kwargs = {
             'amount': { 'validators': [field_bigger_than_0] }

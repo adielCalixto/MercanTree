@@ -11,6 +11,7 @@ interface Transaction {
     payment: number;
     cash_register?: number;
     type: TransactionType;
+    details?: string;
 }
 
 export default Transaction

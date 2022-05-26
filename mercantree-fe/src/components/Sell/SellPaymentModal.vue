@@ -6,10 +6,10 @@
                 Dinheiro
             </div>
             <div class="collapse-content bg-base-200 text-nase-content"> 
-                <form method="POST">
+                <form @submit.prevent="payOrder()">
                     <div class="flex items-center my-4">
                         <span class="text-xl mr-auto">Valor total: </span>
-                        <p class="text-2xl">R${{ price }}</p>
+                        <p class="text-2xl">R${{ price.toFixed(2) }}</p>
                     </div>
                     <div class="flex items-center my-4">
                         <label class="label mr-auto">
@@ -19,13 +19,14 @@
                     </div>
                     <div class="flex items-center my-4">
                         <span class="text-xl mr-auto">Troco:</span>
-                        <p class="text-2xl">R${{ back }}</p>
+                        <p v-if="back < 0" class="text-2xl">Falta R${{ (-back).toFixed(2) }}</p>
+                        <p v-else class="text-2xl">R${{ back }}</p>
+                    </div>
+
+                    <div class="bg-base-200 p-2 mt-8 flex justify-end">
+                        <button type="submit" class="btn btn-sm btn-primary btn-outline">Confirmar</button>
                     </div>
                 </form>
-
-                <div class="bg-base-200 p-2 mt-8 flex justify-end">
-                    <button @click="payOrder" class="btn btn-sm btn-primary btn-outline">Confirmar</button>
-                </div>
             </div>
         </div>
     </div>
@@ -48,7 +49,7 @@
 
     const props = defineProps<Props>()
     const emit = defineEmits<Emits>()
-    const price = computed(() => props.payment.amount)
+    const price = computed(() => parseFloat(props.payment.amount))
     const received = ref(0)
     const back = computed(() => received.value - price.value)
     const paidAmount = computed(() => received.value - (back.value > 0 ? back.value : 0))
@@ -63,7 +64,7 @@
                 emit('paid', paidAmount.value)
             }
             catch(e) {
-                console.error(e)
+                return
             }
         }
     }

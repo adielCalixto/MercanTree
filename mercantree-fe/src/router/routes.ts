@@ -25,6 +25,11 @@ const routes = [
                     name: 'Criar venda',
                     component: () => import('../components/Sell/SellCreatePage.vue'),
                 },
+                {
+                    path: 'order/:id',
+                    name: 'Ver venda',
+                    component: () => import('../components/Sell/SellViewPage.vue'),
+                },
             ] 
         },
         { 

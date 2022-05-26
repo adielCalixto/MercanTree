@@ -30,7 +30,7 @@
                 </th>
                 <th>{{ order.user }}</th>
                 <th>
-                    <router-link :to="`/products/product/${order.id}`" class="btn btn-primary btn-sm">View</router-link>
+                    <router-link :to="`/sell/order/${order.id}`" class="btn btn-primary btn-sm">View</router-link>
                 </th>
             </tr>
         </mt-table>

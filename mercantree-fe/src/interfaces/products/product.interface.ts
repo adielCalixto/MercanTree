@@ -3,11 +3,11 @@ interface Product {
     id?: number;
     description: string;
     expires_at: string;
-    price: number;
+    price: string;
     barcode: string;
     category: string;
     supplier_id?: number;
-    supplier_price: number;
+    supplier_price: string;
     quantity: number;
     stock_quantity?: number;
 }

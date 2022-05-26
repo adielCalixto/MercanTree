@@ -52,16 +52,9 @@
                 <tr v-for="t in store.transactions.results">
                     <th>{{ t.id }}</th>
                     <th>{{ transactionDate(t.created ?? '') }}</th>
+                    <th>{{ t.details ?? '---' }}</th>
                     <th>{{ t.amount }}</th>
                     <th>{{ transactionType(t.type) }}</th>
-                    <th>
-                        <router-link
-                        class="btn btn-sm"
-                        to="/">
-                            Detalhes
-                            <font-awesome-icon class="ml-2" icon="external-link" />
-                        </router-link>
-                    </th>
                 </tr>
             </mt-table>
         </div>
@@ -81,6 +74,15 @@
                     <div class="divider"></div>
 
                     <div class="flex gap-4 justify-end">
+                        <div class="form-control flex-1">
+                            <label class="label">Detalhes</label>
+                            <textarea
+                            class="textarea resize-none"
+                            placeholder="..."
+                            rows="1"
+                            v-model="addForm.details" />
+                        </div>
+
                         <div class="form-control">
                             <label class="label">Valor</label>
                             <input
@@ -88,7 +90,7 @@
                             type="number"
                             name="amount"
                             min="0"
-                            v-model="addInput">
+                            v-model="addForm.amount">
                         </div>
                     </div>
                 </div>
@@ -108,6 +110,15 @@
                     <div class="divider"></div>
 
                     <div class="flex gap-4 justify-end">
+                        <div class="form-control flex-1">
+                            <label class="label">Detalhes</label>
+                            <textarea
+                            class="textarea resize-none"
+                            placeholder="..."
+                            rows="1"
+                            v-model="removeForm.details" />
+                        </div>
+
                         <div class="form-control">
                             <label class="label">Valor</label>
                             <input
@@ -115,7 +126,7 @@
                             type="number"
                             name="amount"
                             min="0"
-                            v-model="removeInput">
+                            v-model="removeForm.amount">
                         </div>
                     </div>
                 </div>
@@ -199,7 +210,7 @@
 </template>
 
 <script setup lang="ts">
-    import { ref, onMounted } from 'vue'
+    import { ref, onMounted, reactive } from 'vue'
     import { RouterLink, useRouter } from 'vue-router'
     import CashRegisterService from '../../services/cashRegisterService';
     import { useStore } from '../../stores/cashregister'
@@ -212,14 +223,20 @@
         fields: [
             '',
             'Data',
+            'Detalhes',
             'Valor',
             'Tipo',
-            ''
         ]
     }
-    const addInput = ref(0)
-    const removeInput = ref(0)
-    const closingForm = ref({
+    const addForm = reactive({
+        amount: 0,
+        details: '',
+    })
+    const removeForm = reactive({
+        amount: 0,
+        details: '',
+    })
+    const closingForm = reactive({
         closed_amount: 0,
         details: '',
     })
@@ -258,7 +275,7 @@
             if (!store.cashRegister.id)
                 return
 
-            const response = await CashRegisterService().deposit(store.cashRegister.id, addInput.value)
+            const response = await CashRegisterService().deposit(store.cashRegister.id, addForm.amount, addForm.details)
             openModal.value = modalList.value.NONE
             store.getTransactions()
         }
@@ -275,7 +292,7 @@
             if (!store.cashRegister.id)
                 return
 
-            const response = await CashRegisterService().withdraw(store.cashRegister.id, removeInput.value)
+            const response = await CashRegisterService().withdraw(store.cashRegister.id, removeForm.amount, removeForm.details)
             openModal.value = modalList.value.NONE
             store.getTransactions()
         }
@@ -286,8 +303,8 @@
 
     const close = async () => {
         try {
-            await store.close(closingForm.value.closed_amount,
-            closingForm.value.details)
+            await store.close(closingForm.closed_amount,
+            closingForm.details)
 
             openModal.value = modalList.value.NONE
             router.push('/')

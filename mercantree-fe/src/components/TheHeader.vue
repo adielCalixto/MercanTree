@@ -1,6 +1,6 @@
 <template>
     <div class="navbar bg-base-200 shadow-md px-4 fixed w-full z-30">
-        <div class="flex-none lg:hidden">
+        <div class="flex-none print:hidden lg:hidden">
             <button @click="openSidebar()" class="btn btn-square btn-ghost">
                 <font-awesome-icon icon='bars' />
             </button>
@@ -8,7 +8,7 @@
         <div class="flex-1">
             <a class="text-2xl font-bold">Mercan<span class="text-green-500">Tree</span></a>
         </div>
-        <div class="flex-none relative">
+        <div class="flex-none relative print:hidden">
             <a @click="showUserInfo = !showUserInfo" class="btn btn-neutral btn-square btn-sm"><font-awesome-icon icon="user-check" /></a>
 
             <div v-if="showUserInfo" class="bg-neutral rounded text-center text-neutral-content p-2 absolute mt-1 right-0 top-full w-40">

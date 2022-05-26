@@ -108,10 +108,10 @@ export default defineComponent({
         const product = ref<Product>({
             name: '',
             description: '',
-            price: 0,
+            price: '0',
             barcode: '',
             supplier_id: undefined,
-            supplier_price: 0.0,
+            supplier_price: '0',
             quantity: 0,
             category: '',
             expires_at: '2021-12-01',

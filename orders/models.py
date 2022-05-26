@@ -35,6 +35,7 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     coupon = models.ForeignKey(Coupon, blank=True, to_field='code', null=True, on_delete=models.SET_NULL)
+    details = models.TextField(null=True, blank=True)
 
     def get_status(self):
         return self.Status(self.status).label

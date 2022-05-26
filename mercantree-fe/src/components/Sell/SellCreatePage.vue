@@ -29,32 +29,28 @@
                 </div>
             </div>
 
-            <table class="table table-compact w-full">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Produto</th>
-                        <th>Quantidade</th>
-                        <th>Preço unt.</th>
-                        <th>Preço total</th>
-                    </tr>
-                </thead>
-                
-                <tbody>
-                    <tr v-for="p in products">
-                        <td></td>
-                        <td>{{ p.data.name }}</td>
-                        <td>{{ p.quantity }}</td>
-                        <td>R${{ p.data.price }}</td>
-                        <td>R${{ p.data.price * p.quantity }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="w-full">
+                <div v-for="p in products" class="flex gap-4 items-center text-lg border-b-2 border-base-300 mb-2">
+                    <p>{{ products.indexOf(p) }}</p>
+                    <p>{{ p.data.name }}</p>
+                    <div class="flex gap-4 ml-auto">
+                        <p class="text-gray-500">{{ p.quantity }} X {{ get_price(p.data.price) }}</p>
+                        <p class="font-bold">= R${{ (parseFloat(p.data.price) * p.quantity).toFixed(2) }}</p>
+                    </div>
+                    <button @click="removeProduct(0)" class="btn btn-sm btn-square btn-ghost text-error">
+                        <font-awesome-icon icon="trash" />
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div class="details bg-base-200">
-                <textarea class="textarea textarea-primary w-full h-full resize-none" :readonly="true" placeholder="Detalhes..."></textarea>
+                <textarea
+                class="textarea textarea-primary w-full h-full resize-none"
+                placeholder="Observações..."
+                v-model="details"
+                ></textarea>
             </div>
 
             <div class="prices bg-base-200">
@@ -86,7 +82,7 @@
         </div>
 
         <div class="modal modal-open" v-if="createModalOpen">
-            <div class="modal-box max-w-2xl">
+            <div class="modal-box max-w-3xl">
                 <sell-products-modal :search="search" @close="createModalOpen = false" @selected="p => { preloadProduct(p) }" />
             </div>
         </div>
@@ -115,7 +111,9 @@
     import SellProductsModal from './SellProductsModal.vue'
     import SellPaymentModal from './SellPaymentModal.vue'
     import { useRouter } from 'vue-router'
+    import get_price from '../../utils/get_price'
     import OrderService from '../../services/orderService'
+    import swal from 'sweetalert'
 
     interface ProductWithQuantity {
         quantity: number;
@@ -126,6 +124,9 @@
     components: {
         SellProductsModal,
         SellPaymentModal,
+    },
+    methods: {
+        get_price,
     },
     setup() {
         const search = ref("");
@@ -138,12 +139,13 @@
         const products = ref<ProductWithQuantity[]>([])
 
         const order = ref<Order>()
+        const details = ref('')
         
         const createModalOpen = ref(false);
         const paymentModalOpen = ref(false);
         const price = computed(() => {
             return products.value.reduce((prev: number, current) => {
-                const price = prev + (current.data.price * current.quantity)
+                const price = prev + (parseFloat(current.data.price) * current.quantity)
                 return price
             }, 0)
         })
@@ -156,8 +158,9 @@
 
                 order.value = {
                     user: store.id,
+                    details: details.value,
                     payment: {
-                        amount: price.value,
+                        amount: price.value.toFixed(2),
                         is_paid: false,
                     },
                     products: products.value.map(p => {
@@ -179,24 +182,23 @@
         }
 
         const orderPaid = async (amount: number) => {
-            if (!order.value)
-                return
+            if (!order.value) return
 
-            if (!order.value.id)
-                return
+            if (!order.value.id) return
 
-            if(order.value.payment.amount <= amount)
+            if(parseFloat(order.value.payment.amount) <= amount)
                 order.value.payment.is_paid = true
 
             order.value.status = OrderStatus.Done
             delete order.value.coupon
 
             try {
-                await OrderService().update(order.value?.id, order.value)
+                await OrderService().update(order.value.id, order.value)
+                await swal('Sucesso', 'Venda concluída', 'success')
                 router.push('/sell')
             }
             catch(e) {
-                console.error(e)
+                return
             }
         }
 
@@ -226,6 +228,10 @@
             }
         }
 
+        const removeProduct = (index: number) => {
+            products.value.splice(index, 1)
+        }
+
         return {
             search,
             selectedProduct,
@@ -235,11 +241,13 @@
             createModalOpen,
             paymentModalOpen,
             addProduct,
+            removeProduct,
             preloadProduct,
             quantity,
             products,
             price,
             orderPaid,
+            details,
         };
     },
 })

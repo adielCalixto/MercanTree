@@ -1,5 +1,6 @@
 import Payment from "../payments/payment.interface";
-import OrderProduct from "./order_product.interface";
+import { User } from "../users/user.interface";
+import OrderProduct, { ExpandedOrderProduct } from "./order_product.interface";
 
 enum OrderStatus {
     'Done' = 'DN',
@@ -16,7 +17,14 @@ interface Order {
     id?: number;
     created?: string;
     status?: OrderStatus;
+    details?: string;
+}
+
+interface ExpandedOrder extends Omit<Order, 'user'|'products'> {
+    user: User;
+    products: ExpandedOrderProduct[];
 }
 
 export default Order
+export type { ExpandedOrder }
 export { OrderStatus }

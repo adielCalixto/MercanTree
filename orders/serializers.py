@@ -1,13 +1,19 @@
 import uuid
 from rest_framework import serializers
 from payments.serializers import PaymentSerializer
+from products.models import Product
 from products.serializers import ProductSerializer
+from users.models import User
+from users.serializers import UserSerializer
+from django.db.models import Sum
 from .models import Order, OrderProduct, Coupon
 from payments.models import Payment
 from rest_flex_fields import FlexFieldsModelSerializer
 
 
-class OrderProductSerializer(serializers.ModelSerializer):
+class OrderProductSerializer(FlexFieldsModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+
     class Meta:
         model = OrderProduct
         fields = '__all__'
@@ -19,6 +25,27 @@ class OrderProductSerializer(serializers.ModelSerializer):
                 'validators': []
             }
         }
+        expandable_fields = {
+            'product': ProductSerializer,
+        }
+
+    def validate(self, data):
+        # custom validation method to check if OrderProduct's product has stock
+
+        # get the Product serializer to access the stock_quantity field
+        product_serializer = ProductSerializer(instance=data['product'])
+        current_amount = 0
+
+        if 'id' in data.keys():
+            order_product = OrderProduct.objects.get(id=uuid.UUID(data['id']))
+            current_amount = order_product.quantity
+
+        # if the Product does not have the desired quantity, throws validation error
+        if data['quantity'] > (product_serializer.data['stock_quantity'] + current_amount):
+            raise serializers.ValidationError({'quantity': ['Product has no stock']})
+
+
+        return data
     
 
     def create(self, validated_data):        
@@ -43,19 +70,6 @@ class OrderProductSerializer(serializers.ModelSerializer):
         return instance
 
 
-    def validate(self, data):
-        # custom validation method to check if OrderProduct's product has stock
-
-        # get the Product serializer to access the stock_quantity field
-        product_serializer = ProductSerializer(instance=data['product'])
-
-        # if the Product does not have the desired quantity, throws validation error
-        if data['quantity'] > product_serializer.data['stock_quantity']:
-            raise serializers.ValidationError({'quantity': ['Product has no stock']})
-
-        return data
-
-
 class CouponSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
 
@@ -72,11 +86,16 @@ class OrderSerializer(FlexFieldsModelSerializer):
     payment = PaymentSerializer(required=True)
     products = OrderProductSerializer(many=True, required=False)
     coupon = serializers.PrimaryKeyRelatedField(queryset=Coupon.objects.all(), required=False)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'created', 'payment', 'status', 'products', 'coupon']
+        fields = ['id', 'user', 'created', 'payment', 'status', 'products', 'coupon', 'details']
         read_only_fields = ['id', 'created']
+        expandable_fields = {
+            'user': UserSerializer,
+            'products': (OrderProductSerializer, { 'many': True })
+        }
 
     
     def create(self, validated_data):
