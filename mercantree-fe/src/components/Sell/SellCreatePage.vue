@@ -37,7 +37,7 @@
                         <p class="text-gray-500">{{ p.quantity }} X {{ get_price(p.data.price) }}</p>
                         <p class="font-bold">= R${{ (parseFloat(p.data.price) * p.quantity).toFixed(2) }}</p>
                     </div>
-                    <button @click="removeProduct(0)" class="btn btn-sm btn-square btn-ghost text-error">
+                    <button @click="removeProduct(products.indexOf(p))" class="btn btn-sm btn-square btn-ghost text-error">
                         <font-awesome-icon icon="trash" />
                     </button>
                 </div>
