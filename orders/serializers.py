@@ -48,6 +48,13 @@ class OrderProductSerializer(FlexFieldsModelSerializer):
         return data
     
 
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError('Quantity should be bigger than 0')
+
+        return value
+
+
     def create(self, validated_data):        
         # pop id, since it should be generated automatically
         validated_data.pop('id', None)

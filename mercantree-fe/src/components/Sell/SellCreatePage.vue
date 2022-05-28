@@ -2,12 +2,16 @@
     <div class="flex flex-col gap-4">
         <div class="form bg-base-200 p-2">
             <div class="flex flex-col items-center md:flex-row md:items-end gap-4 mb-8">
-                <form @submit.prevent="createModalOpen = true" method="post">
+                <form @submit.prevent="searchProduct()" method="post">
                     <div class="form-control">
                         <label class="label">
                             <span class="label-text">(Nome, Código de barras, Descrição)</span>
                         </label>
-                        <input type="text" v-model="search" class="input max-w-md input-sm input-bordered">
+
+                        <input
+                        type="text"
+                        v-model="state.product.search"
+                        class="input max-w-md input-sm input-bordered">
                     </div>
                 </form>
 
@@ -18,13 +22,24 @@
                     </p>
                 </div>
 
-                <div class="flex md:ml-auto">
+                <div class="flex gap-2 md:ml-auto relative">
                     <div>
-                        <input type="number" v-model="quantity" placeholder="Quantidade" class="input max-w-md input-sm input-bordered">
+                        <input
+                        type="number"
+                        min="0"
+                        v-model="state.product.quantity"
+                        placeholder="Quantidade"
+                        class="input max-w-md input-sm input-bordered">
                     </div>
 
                     <div>
                         <button @click="addProduct()" class="btn btn-square btn-sm">+</button>
+                    </div>
+
+                    <div
+                    class="absolute bottom-0 transform rounded-none translate-y-full text-sm font-bold"
+                    v-if="v$.product.quantity.maxValue.$invalid">
+                        !Em estoque: {{ selectedProduct?.stock_quantity }}
                     </div>
                 </div>
             </div>
@@ -49,7 +64,7 @@
                 <textarea
                 class="textarea textarea-primary w-full h-full resize-none"
                 placeholder="Observações..."
-                v-model="details"
+                v-model="state.details"
                 ></textarea>
             </div>
 
@@ -83,17 +98,13 @@
 
         <div class="modal modal-open" v-if="createModalOpen">
             <div class="modal-box max-w-3xl">
-                <sell-products-modal :search="search" @close="createModalOpen = false" @selected="p => { preloadProduct(p) }" />
+                <sell-products-modal :search="state.product.search" @close="createModalOpen = false" @selected="p => { preloadProduct(p) }" />
             </div>
         </div>
 
         <div class="modal modal-open" v-if="paymentModalOpen">
             <div class="modal-box max-w-2xl">
                 <sell-payment-modal v-if="order?.payment" :payment="order?.payment" @paid="amount => orderPaid(amount)" @close="paymentModalOpen = false" />
-
-                <div v-else>
-                    Loading...
-                </div>
             </div>
             <div class="modal-toggle">
                 <button @click="paymentModalOpen = false" class="btn">Close</button>
@@ -114,6 +125,8 @@
     import get_price from '../../utils/get_price'
     import OrderService from '../../services/orderService'
     import swal from 'sweetalert'
+    import { maxValue, minValue, required } from '@vuelidate/validators'
+    import useVuelidate from '@vuelidate/core'
 
     interface ProductWithQuantity {
         quantity: number;
@@ -129,17 +142,30 @@
         get_price,
     },
     setup() {
-        const search = ref("");
-        const quantity = ref(0)
-        const error = ref();
-        const store = useStore();
-        const router = useRouter();
+        const store = useStore()
+        const router = useRouter()
 
-        const selectedProduct = ref<Product>();
+        const selectedProduct = ref<Product>()
         const products = ref<ProductWithQuantity[]>([])
 
         const order = ref<Order>()
-        const details = ref('')
+
+        const state = ref({
+            details: '',
+            product: {
+                search: '',
+                quantity: 0,
+            },
+        })
+
+        const rules = computed(() => ({
+            product: {
+                search: { required, $autoDirty: true },
+                quantity: { required, minValue: minValue(1), maxValue: maxValue(selectedProduct.value?.stock_quantity ?? Number.MAX_VALUE), $autoDirty: true },
+            }
+        }))
+
+        const v$ = useVuelidate(rules, state)
         
         const createModalOpen = ref(false);
         const paymentModalOpen = ref(false);
@@ -158,7 +184,7 @@
 
                 order.value = {
                     user: store.id,
-                    details: details.value,
+                    details: state.value.details,
                     payment: {
                         amount: price.value.toFixed(2),
                         is_paid: false,
@@ -177,7 +203,7 @@
                 paymentModalOpen.value = true
             }
             catch (e) {
-                error.value = e;
+                return
             }
         }
 
@@ -208,24 +234,31 @@
         }
 
         const addProduct = () => {
-            if(!selectedProduct.value)
-                return
+            if(v$.value.product.quantity.$error) return
 
-            if(!selectedProduct.value.id)
-                return
+            if(!selectedProduct.value) return
+
+            if(!selectedProduct.value.id) return
 
             const result = products.value.findIndex((product) => product.data.id == selectedProduct.value?.id)
             if(result !== -1) {
                 products.value[result] = {
                     data: selectedProduct.value,
-                    quantity: quantity.value
+                    quantity: state.value.product.quantity
                 }
             } else {
                 products.value.push({
                     data: selectedProduct.value,
-                    quantity: quantity.value
+                    quantity: state.value.product.quantity
                 })
             }
+        }
+
+        const searchProduct = async () => {
+            await v$.value.$validate()
+            if(v$.value.product.search.$error) return
+
+            createModalOpen.value = true
         }
 
         const removeProduct = (index: number) => {
@@ -233,21 +266,20 @@
         }
 
         return {
-            search,
+            state,
             selectedProduct,
-            error,
             order,
             saveOrder,
             createModalOpen,
             paymentModalOpen,
             addProduct,
+            searchProduct,
             removeProduct,
             preloadProduct,
-            quantity,
             products,
             price,
             orderPaid,
-            details,
+            v$,
         };
     },
 })

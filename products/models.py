@@ -18,8 +18,8 @@ class Supplier(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=200, null=True, blank=True)
-    barcode = models.CharField(max_length=255)
-    expires_at = models.DateTimeField('Date of expiration')
+    barcode = models.CharField(max_length=255, null=True, blank=True)
+    expires_at = models.DateTimeField('Date of expiration', null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=False)
     supplier_price = models.DecimalField(max_digits=10, decimal_places=2, blank=False)
     quantity = models.IntegerField(null=False, default=1)

@@ -6,15 +6,27 @@
         <form class="relative" @keydown="(e) => e.key == 'Enter' ? e.preventDefault() : e">
             <div class="flex gap-4">
                 <label class="label">
-                    <span class="label-text">Nome:</span>
+                    <span class="label-text">* Nome:</span>
                 </label>
-                <input v-model="product.name" type="text"  class="input max-w-md input-sm input-bordered">
+
+                <input
+                v-model="product.name"
+                type="text" 
+                class="input max-w-md input-sm input-bordered">
+
+                <div class="badge badge-ghost rounded-none mt-1 gap-2" v-if="v$.name.$error">
+                    {{ v$.name.$errors[0].$message }}
+                </div>
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
                     <span class="label-text">Descrição:</span>
                 </label>
-                <input v-model="product.description" type="text" class="input max-w-md input-sm input-bordered">
+
+                <input
+                v-model="product.description"
+                type="text"
+                class="input max-w-md input-sm input-bordered">
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
@@ -34,33 +46,67 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Preço:</span>
+                    <span class="label-text">* Preço:</span>
                 </label>
-                <input v-model="product.price" type="number" class="input max-w-md input-sm input-bordered">
+
+                <input
+                min="0"
+                v-model="product.price"
+                type="number"
+                class="input max-w-md input-sm input-bordered">
+
+                <div class="badge badge-ghost rounded-none mt-1 gap-2" v-if="v$.price.$error">
+                    {{ v$.price.$errors[0].$message }}
+                </div>
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Preço de compra:</span>
+                    <span class="label-text">* Preço de custo:</span>
                 </label>
-                <input v-model="product.supplier_price" type="number" class="input max-w-md input-sm input-bordered">
+
+                <input
+                min="0"
+                v-model="product.supplier_price"
+                type="number"
+                class="input max-w-md input-sm input-bordered">
+
+                <div class="badge badge-ghost rounded-none mt-1 gap-2" v-if="v$.supplier_price.$error">
+                    {{ v$.supplier_price.$errors[0].$message }}
+                </div>
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Quantidade:</span>
+                    <span class="label-text">* Quantidade:</span>
                 </label>
-                <input v-model="product.quantity" type="number" class="input max-w-md input-sm input-bordered">
+
+                <input
+                min="0"
+                v-model="product.quantity"
+                type="number"
+                class="input max-w-md input-sm input-bordered">
+
+                <div class="badge badge-ghost rounded-none mt-1 gap-2" v-if="v$.quantity.$error">
+                    {{ v$.quantity.$errors[0].$message }}
+                </div>
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
                     <span class="label-text">Validade:</span>
                 </label>
-                <input v-model="product.expires_at" type="date" class="input max-w-md input-sm input-bordered">
+                <input
+                v-model="product.expires_at"
+                type="date"
+                class="input max-w-md input-sm input-bordered">
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
                     <span class="label-text">Código de barras:</span>
                 </label>
-                <input v-model="product.barcode" type="text" class="input max-w-md input-sm input-bordered">
+
+                <input
+                v-model="product.barcode"
+                type="text"
+                class="input max-w-md input-sm input-bordered">
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
@@ -88,8 +134,10 @@
 
 <script lang="ts">
 
+import useVuelidate from "@vuelidate/core"
+import { decimal, minValue, numeric, required } from "@vuelidate/validators"
 import swal from "sweetalert"
-import { defineComponent, onMounted, ref } from "vue"
+import { computed, defineComponent, onMounted, reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import { APIListResponse } from "../../interfaces/common/response.interface"
 import Category from "../../interfaces/products/category.interface"
@@ -114,8 +162,18 @@ export default defineComponent({
             supplier_price: '0',
             quantity: 0,
             category: '',
-            expires_at: '2021-12-01',
+            expires_at: undefined,
         })
+
+        const rules = computed(() => ({
+            name: { required, $autoDirty: true },
+            price: { required, decimal, minValue: minValue(product.value.supplier_price), $autoDirty: true },
+            supplier_price: { required, decimal, minValue: minValue(0), $autoDirty: true },
+            quantity: { required, numeric, minValue: minValue(1), $autoDirty: true },
+        }))
+
+        const v$ = useVuelidate(rules, product)
+
         const suppliers = ref<APIListResponse<Supplier>>({ count: 0, results: [] })
         const categories = ref<APIListResponse<Category>>({ count: 0, results: [] })
         const error = ref()
@@ -125,6 +183,9 @@ export default defineComponent({
 
         const createProduct = async (redirect: boolean = false) => {
             try {
+                await v$.value.$validate()
+                if(v$.value.$error) return
+
                 isLoading.value = true
                 const response = await ProductService().create(product.value)
                 isLoading.value = false
@@ -169,6 +230,7 @@ export default defineComponent({
 
         return {
             product,
+            v$,
             isLoading,
             error,
             createProduct,

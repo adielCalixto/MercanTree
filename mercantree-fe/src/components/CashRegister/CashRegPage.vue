@@ -80,7 +80,7 @@
                             class="textarea resize-none"
                             placeholder="..."
                             rows="1"
-                            v-model="addForm.details" />
+                            v-model="state.addAmount.details" />
                         </div>
 
                         <div class="form-control">
@@ -90,7 +90,10 @@
                             type="number"
                             name="amount"
                             min="0"
-                            v-model="addForm.amount">
+                            v-model="state.addAmount.amount">
+                            <div v-if="v$.addAmount.$error">
+                                {{ v$.addAmount.amount.$errors[0].$message }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -116,7 +119,7 @@
                             class="textarea resize-none"
                             placeholder="..."
                             rows="1"
-                            v-model="removeForm.details" />
+                            v-model="state.removeAmount.details" />
                         </div>
 
                         <div class="form-control">
@@ -126,7 +129,10 @@
                             type="number"
                             name="amount"
                             min="0"
-                            v-model="removeForm.amount">
+                            v-model="state.removeAmount.amount">
+                            <div v-if="v$.removeAmount.$error">
+                                {{ v$.removeAmount.amount.$errors[0].$message }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -158,14 +164,18 @@
                             <textarea
                             class="textarea textarea-primary resize-none w-full"
                             rows="1"
-                            v-model="closingForm.details"></textarea>
+                            v-model="state.close.details"></textarea>
                         </div>
                         <div class="form-control">
                             <label class="label">Valor em caixa:</label>
                             <input
                             class="input input-primary input-sm"
                             type="number"
-                            v-model="closingForm.closed_amount">
+                            min="0"
+                            v-model="state.close.amount">
+                            <div v-if="v$.close.$error">
+                                {{ v$.close.amount.$errors[0].$message }}
+                            </div>
                         </div>
                     </div>
 
@@ -210,6 +220,8 @@
 </template>
 
 <script setup lang="ts">
+    import useVuelidate from '@vuelidate/core';
+    import { minValue, numeric, required } from '@vuelidate/validators';
     import { ref, onMounted, reactive } from 'vue'
     import { RouterLink, useRouter } from 'vue-router'
     import CashRegisterService from '../../services/cashRegisterService';
@@ -228,18 +240,35 @@
             'Tipo',
         ]
     }
-    const addForm = reactive({
-        amount: 0,
-        details: '',
+
+    const state = reactive({
+        addAmount: {
+            amount: 0,
+            details: '',
+        },
+        removeAmount: {
+            amount: 0,
+            details: '',
+        },
+        close: {
+            amount: 0,
+            details: '',
+        },
     })
-    const removeForm = reactive({
-        amount: 0,
-        details: '',
-    })
-    const closingForm = reactive({
-        closed_amount: 0,
-        details: '',
-    })
+
+    const rules = {
+        addAmount: {
+            amount: { required, numeric, minValue: minValue(1), $autoDirty: true },
+        },
+        removeAmount: {
+            amount: { required, numeric, minValue: minValue(1), $autoDirty: true },
+        },
+        close: {
+            amount: { required, numeric, minValue: minValue(0), $autoDirty: true },
+        },
+    }
+
+    const v$ = useVuelidate(rules, state)
 
     const transactionType = (type: string) => {
         switch(type) {
@@ -269,13 +298,14 @@
 
     const depositCash = async () => {
         try {
-            if (!store.cashRegister)
-                return
+            if (!store.cashRegister) return
 
-            if (!store.cashRegister.id)
-                return
+            if (!store.cashRegister.id) return
 
-            const response = await CashRegisterService().deposit(store.cashRegister.id, addForm.amount, addForm.details)
+            await v$.value.$validate()
+            if (v$.value.addAmount.$error) return
+
+            const response = await CashRegisterService().deposit(store.cashRegister.id, state.addAmount.amount, state.addAmount.details)
             openModal.value = modalList.value.NONE
             store.getTransactions()
         }
@@ -286,13 +316,14 @@
 
     const removeCash = async () => {
         try {
-            if (!store.cashRegister)
-                return
+            if (!store.cashRegister) return
 
-            if (!store.cashRegister.id)
-                return
+            if (!store.cashRegister.id) return
 
-            const response = await CashRegisterService().withdraw(store.cashRegister.id, removeForm.amount, removeForm.details)
+            await v$.value.$validate()
+            if (v$.value.removeAmount.$error) return
+
+            const response = await CashRegisterService().withdraw(store.cashRegister.id, state.removeAmount.amount, state.removeAmount.details)
             openModal.value = modalList.value.NONE
             store.getTransactions()
         }
@@ -303,8 +334,11 @@
 
     const close = async () => {
         try {
-            await store.close(closingForm.closed_amount,
-            closingForm.details)
+            await v$.value.$validate()
+            if (v$.value.close.$error) return
+
+            await store.close(state.close.amount,
+            state.close.details)
 
             openModal.value = modalList.value.NONE
             router.push('/')
@@ -320,7 +354,7 @@
             await store.getTransactions()
         }
         catch(e) {
-            console.error(e)
+            return
         }
     })
 

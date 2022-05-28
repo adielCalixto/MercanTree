@@ -22,6 +22,13 @@ class ProductSerializer(serializers.ModelSerializer):
         return count
 
 
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError('Quantity should be bigger than 0')
+
+        return value
+
+
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier

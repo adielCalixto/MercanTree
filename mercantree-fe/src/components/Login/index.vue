@@ -9,13 +9,31 @@
                 <label class="label">
                     <span class="label-text">Email</span>
                 </label>
-                <input type="email" v-model="data.email" placeholder="email" class="input input-bordered w-full">
+
+                <input
+                type="email"
+                v-model="state.email"
+                placeholder="email"
+                class="input input-bordered w-full">
+
+                <div class="badge badge-ghost rounded-none mt-1 ml-auto gap-2" v-if="v$.email.$error">
+                    {{ v$.email.$errors[0].$message }}
+                </div>
             </div>
             <div class="form-control w-full my-4">
                 <label class="label">
                     <span class="label-text">Senha</span>
                 </label>
-                <input type="password" v-model="data.password" placeholder="senha" class="input input-bordered w-full">
+
+                <input
+                type="password"
+                v-model="state.password"
+                placeholder="senha"
+                class="input input-bordered w-full">
+
+                <div class="badge badge-ghost rounded-none mt-1 ml-auto gap-2" v-if="v$.password.$error">
+                    {{ v$.password.$errors[0].$message }}
+                </div>
             </div>
             <div class="form-control items-end">
                 <button type="submit" class="btn btn-secondary btn-sm w-1/3 btn-outline">Entrar</button>
@@ -27,8 +45,10 @@
 <script lang='ts'>
 
 import { useStore } from '../../stores/auth'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useVuelidate } from '@vuelidate/core'
+import { required, email } from '@vuelidate/validators'
 
 export default {
     name: 'Login',
@@ -36,13 +56,23 @@ export default {
         const store = useStore()
         const router = useRouter()
 
-        const data = ref({
+        const state = reactive({
             email: '',
             password: '',
         })
 
-        const login = () => {
-            store.loginUser({username: data.value.email, password: data.value.password})
+        const rules = {
+            email: { required, email, $autoDirty: true },
+            password: { required, $autoDirty: true },
+        }
+
+        const v$ = useVuelidate(rules, state)
+
+        const login = async () => {
+            await v$.value.$validate()
+            if(v$.value.$error) return
+
+            store.loginUser({username: state.email, password: state.password})
             .then(() => {
                 router.push('/') 
             })
@@ -54,7 +84,8 @@ export default {
         return {
             store,
             login,
-            data,
+            state,
+            v$,
         }
     },
 }

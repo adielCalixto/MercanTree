@@ -10,6 +10,11 @@ def field_bigger_than_0(value):
             raise serializers.ValidationError('Value should be bigger than 0')
 
 
+def integer_field(value):
+    if value < 0:
+        raise serializers.ValidationError('Value should be bigger or equal to 0')
+
+
 class PaymentSerializer(serializers.ModelSerializer):
     paid_amount = serializers.SerializerMethodField()
 
@@ -36,8 +41,8 @@ class CashRegisterSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['id', 'created', 'updated']
         extra_kwargs = {
-            'initial_amount': { 'validators': [field_bigger_than_0] },
-            'closed_amount': { 'validators': [field_bigger_than_0] },
+            'initial_amount': { 'validators': [integer_field] },
+            'closed_amount': { 'validators': [integer_field] },
             'open': { 'validators': [validators.UniqueValidator(queryset=CashRegister.objects.filter(open=True))] }
         }
 

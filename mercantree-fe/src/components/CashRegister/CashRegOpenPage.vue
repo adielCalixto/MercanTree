@@ -13,9 +13,10 @@
                     <input
                     type="number"
                     min="0"
-                    v-model="amount"
+                    v-model="state.amount"
                     class="input input-sm input-primary">
                 </div>
+
                 <div class="flex gap-4 justify-end mt-8">
                     <button
                     class="btn btn-primary btn-outline"
@@ -32,25 +33,38 @@
     import { ref } from 'vue'
     import { useStore } from '../../stores/auth'
     import { useRouter } from 'vue-router'
-import CashRegisterService from '../../services/cashRegisterService';
+    import CashRegisterService from '../../services/cashRegisterService'
+    import { minValue, numeric, required } from '@vuelidate/validators'
+    import useVuelidate from '@vuelidate/core'
 
-    const amount = ref(0)
+    const state = ref({
+        amount: 0,
+    })
     const store = useStore()
     const router = useRouter()
 
+    const rules = {
+        amount: { required, minValue: minValue(0), numeric, $autoDirty: true }
+    }
+
+    const v$ = useVuelidate(rules, state)
+
     const openCashRegister = async () => {
         try {
+            await v$.value.$validate()
+            if (v$.value.$error) return
+
             await CashRegisterService().create({
                 details: '',
                 open: true,
-                initial_amount: amount.value,
+                initial_amount: state.value.amount,
                 user: store.id,
             })
 
             router.push('/cashregister')
         }
         catch(e) {
-            console.error(e)
+            return
         }
     }
 </script>
