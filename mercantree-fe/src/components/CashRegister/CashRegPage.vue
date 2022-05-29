@@ -52,7 +52,7 @@
                 <tr v-for="t in store.transactions.results">
                     <th>{{ t.id }}</th>
                     <th>{{ transactionDate(t.created ?? '') }}</th>
-                    <th>{{ t.details ?? '---' }}</th>
+                    <th>{{ t.details || '---' }}</th>
                     <th>{{ t.amount }}</th>
                     <th>{{ transactionType(t.type) }}</th>
                 </tr>
@@ -225,6 +225,7 @@
     import { ref, onMounted, reactive } from 'vue'
     import { RouterLink, useRouter } from 'vue-router'
     import CashRegisterService from '../../services/cashRegisterService';
+    import errorService from '../../services/errorService';
     import { useStore } from '../../stores/cashregister'
     import MtTable from '../MtTable.vue'
 
@@ -337,11 +338,13 @@
             await v$.value.$validate()
             if (v$.value.close.$error) return
 
+            await errorService().onWarn()
+
             await store.close(state.close.amount,
             state.close.details)
 
             openModal.value = modalList.value.NONE
-            router.push('/')
+            router.push('/cashregister/closed')
         }
         catch(e) {
             console.error(e)
