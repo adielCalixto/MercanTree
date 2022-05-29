@@ -31,6 +31,6 @@ body.sidebar--open .sidebar {
     @apply flex-col;
 }
 
-.sidebar__item a.router-link-active {
+.sidebar__item a.router-link-exact-active {
     @apply text-secondary;
 }

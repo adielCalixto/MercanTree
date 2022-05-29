@@ -1,12 +1,12 @@
 enum TransactionType {
-    "CashDeposit" = "CI",
-    "CashBack" = "CB"
+    "Depósito" = "CI",
+    "Saque" = "CB"
 }
 
 
 interface Transaction {
     id?: number;
-    amount: number;
+    amount: string;
     created?: string;
     payment: number;
     cash_register?: number;

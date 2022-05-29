@@ -63,6 +63,18 @@ export default function CashRegisterService() {
         })
     }
 
+    const getClosed = async (): Promise<APIListResponse<CashRegister>> => {
+        return axios.get(`api/cashregister/?open=false`)
+        .then(response => {
+            return Promise.resolve(response.data)
+        })
+        .catch(error => {
+
+            errorService().onError(error)
+            return Promise.reject(error)
+        })
+    }
+
     const deposit = async (id: number, amount: number, details: string): Promise<Transaction> => {
         // deposit cash into the cashregister
         return PaymentService().create({ amount: amount.toFixed(2), is_paid: true, type: PaymentType.CashRegisterPayment })
@@ -131,5 +143,6 @@ export default function CashRegisterService() {
         deposit,
         withdraw,
         getOpen,
+        getClosed,
     }
 }

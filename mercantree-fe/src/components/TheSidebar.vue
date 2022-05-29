@@ -37,6 +37,13 @@
                 </router-link>
             </li>
 
+            <li class="sidebar__item">
+                <router-link to="/cashregister/closed">
+                    <font-awesome-icon icon="cash-register" />
+                    Caixas Fechados
+                </router-link>
+            </li>
+
             <div class="divider"></div>
 
             <li class="sidebar__item">
