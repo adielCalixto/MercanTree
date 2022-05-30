@@ -42,36 +42,35 @@
         <div v-else-if="activeTab == 1">
             <h2 class="text-lg font-semibold mb-4">Pagamento:</h2>
 
-            <div>
+            <div class="mb-8">
                 <p>Valor: <b>{{ get_price(order?.payment.amount ?? '') }}</b></p>
                 <p>Valor pago: <b>{{ get_price(order?.payment.paid_amount ?? '') }}</b></p>
             </div>
 
-            <form @submit.prevent="addAmount()" method="POST" class="flex gap-4 print:hidden my-4 justify-end">
-                <div class="form-control">
-                    <input
-                    class="input input-sm input-primary"
-                    type="number"
-                    v-model="formAmount">
-                </div>
-                <button type="submit" class="btn btn-success btn-sm">
-                    Adicionar quantia
-                    <font-awesome-icon icon="add" />
-                </button>
-            </form>
+            <div>
+                <h2 class="text-lg text-right font-bold">Pagar</h2>
+                <form @submit.prevent="addAmount()" method="POST" class="flex gap-4 print:hidden my-4 justify-end">
+                    <div class="form-control">
+                        <input
+                        class="input input-sm input-primary"
+                        type="number"
+                        min="0"
+                        v-model="state.depositAmount">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm">
+                        Adicionar quantia
+                        <font-awesome-icon icon="add" />
+                    </button>
+                </form>
 
-            <form @submit.prevent="addAmount()" method="POST" class="flex gap-4 print:hidden my-4 justify-end">
-                <div class="form-control">
-                    <input
-                    class="input input-sm input-primary"
-                    type="number"
-                    v-model="formAmount">
+                <div class="text-right text-sm" v-if="v$.depositAmount.$error">
+                    <p v-for="error in v$.depositAmount.$errors">
+                        {{ error.$message }}
+                    </p>
                 </div>
-                <button type="submit" class="btn btn-success btn-sm">
-                    Devolução
-                    <font-awesome-icon icon="add" />
-                </button>
-            </form>
+            </div>
+
+            <div class="divider"></div>
 
         </div>
     </div>
@@ -79,21 +78,32 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { ExpandedOrder } from '../../interfaces/orders/order.interface'
+import { ExpandedOrder, OrderStatus } from '../../interfaces/orders/order.interface'
 import OrderService from '../../services/orderService'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import get_price from '../../utils/get_price'
 import PaymentService from '../../services/paymentService'
 import { useStore } from '../../stores/cashregister'
 import swal from 'sweetalert'
 import errorService from '../../services/errorService'
+import { minValue, required } from '@vuelidate/validators'
+import useVuelidate from '@vuelidate/core'
 
 const order = ref<ExpandedOrder>()
 const route = useRoute()
+const router = useRouter()
 const store = useStore()
 const id = computed(() => route.params.id.toString())
-const formAmount = ref()
+const state = ref({
+    depositAmount: 0,
+})
 const activeTab = ref(0)
+
+const rules = {
+    depositAmount: { $autoDirty: true, required, minValue: minValue(1) }
+}
+
+const v$ = useVuelidate(rules, state)
 
 const getOrder = async () => {
     try {
@@ -111,13 +121,26 @@ const addAmount = async () => {
             return swal('Atenção', 'Valor total já foi pago', 'warning')
         }
 
+        await v$.value.$validate()
+            if (v$.value.$error) return
+
         errorService().onWarn('Tem certeza?', 'Você está prestes a depositar uma quantia nesta venda')
         .then(async () => {
             if (!order.value?.payment.id) return
+            if (!order.value.id) return
 
             await store.getCashRegister()
             const cashRegisterId = store.cashRegister.id ? store.cashRegister.id : undefined
-            await PaymentService().deposit(order.value.payment.id, formAmount.value, cashRegisterId)
+            await PaymentService().deposit(order.value.payment.id, state.value.depositAmount, cashRegisterId)
+
+            const order_to_update = await OrderService().retrieve(order.value.id)
+            delete order_to_update.coupon
+            order_to_update.status = OrderStatus.Done
+            if(parseFloat(order.value.payment.amount) <= state.value.depositAmount)
+                order_to_update.payment.is_paid = true
+
+            await OrderService().update(order.value.id, order_to_update)
+            swal('Sucesso', 'Venda alterada', 'success')
             getOrder()
         })
         .catch(() => {

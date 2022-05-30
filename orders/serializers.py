@@ -134,7 +134,7 @@ class OrderSerializer(FlexFieldsModelSerializer):
     def update(self, instance, validated_data):
         # get nested data
         order_products = validated_data.pop('products', [])
-        payment_data = validated_data.pop('payment')
+        payment_data = validated_data.pop('payment', None)
 
         # payment instance
         payment = instance.payment
@@ -145,10 +145,11 @@ class OrderSerializer(FlexFieldsModelSerializer):
         instance.coupon = validated_data.get('coupon', instance.coupon)
         instance.save()
 
-        # updating payment
-        payment.amount = payment_data.get('amount', payment_data['amount'])
-        payment.is_paid = payment_data.get('is_paid', payment_data['is_paid'])
-        payment.save()
+        if payment_data is not None:
+            # updating payment
+            payment.amount = payment_data.get('amount', payment_data['amount'])
+            payment.is_paid = payment_data.get('is_paid', payment_data['is_paid'])
+            payment.save()
 
         # get all OrderProducts that belongs to this order
         order_products_with_order_id = OrderProduct.objects.filter(order=instance.pk).values_list('id', flat=True)
