@@ -53,7 +53,7 @@
                     <th>{{ t.id }}</th>
                     <th>{{ transactionDate(t.created ?? '') }}</th>
                     <th>{{ t.details || '---' }}</th>
-                    <th>{{ t.amount }}</th>
+                    <th>{{ get_price(t.amount) }}</th>
                     <th>{{ transactionType(t.type) }}</th>
                 </tr>
             </mt-table>
@@ -222,12 +222,13 @@
 <script setup lang="ts">
     import useVuelidate from '@vuelidate/core';
     import { minValue, numeric, required } from '@vuelidate/validators';
-    import { ref, onMounted, reactive } from 'vue'
+    import { ref, onMounted, reactive, computed } from 'vue'
     import { RouterLink, useRouter } from 'vue-router'
     import CashRegisterService from '../../services/cashRegisterService';
     import errorService from '../../services/errorService';
     import { useStore } from '../../stores/cashregister'
     import MtTable from '../MtTable.vue'
+    import get_price from '../../utils/get_price'
 
     const store = useStore()
     const router = useRouter()
@@ -257,7 +258,7 @@
         },
     })
 
-    const rules = {
+    const rules = computed(() => ({
         addAmount: {
             amount: { required, numeric, minValue: minValue(1), $autoDirty: true },
         },
@@ -267,7 +268,7 @@
         close: {
             amount: { required, numeric, minValue: minValue(0), $autoDirty: true },
         },
-    }
+    }))
 
     const v$ = useVuelidate(rules, state)
 
@@ -311,7 +312,7 @@
             store.getTransactions()
         }
         catch(e) {
-            console.error(e)
+            return
         }
     }
 
@@ -329,7 +330,7 @@
             store.getTransactions()
         }
         catch(e) {
-            console.error(e)
+            return
         }
     }
 
@@ -347,7 +348,7 @@
             router.push('/cashregister/closed')
         }
         catch(e) {
-            console.error(e)
+            return
         }
     }
 
