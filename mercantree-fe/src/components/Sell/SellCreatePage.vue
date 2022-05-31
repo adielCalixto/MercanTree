@@ -44,15 +44,15 @@
                 </div>
             </div>
 
-            <div class="w-full">
-                <div v-for="p in products" class="flex gap-4 items-center text-lg border-b-2 border-base-300 mb-2">
-                    <p>{{ products.indexOf(p) }}</p>
+            <div class="w-full max-h-48 overflow-y-auto">
+                <div v-for="p in orderStore.products" class="flex gap-4 items-center text-lg border-b-2 border-base-300 mb-2">
+                    <p>{{ orderStore.products.indexOf(p) }}</p>
                     <p>{{ p.data.name }}</p>
                     <div class="flex gap-4 ml-auto">
                         <p class="text-gray-500">{{ p.quantity }} X {{ get_price(p.data.price) }}</p>
                         <p class="font-bold">= R${{ (parseFloat(p.data.price) * p.quantity).toFixed(2) }}</p>
                     </div>
-                    <button @click="removeProduct(products.indexOf(p))" class="btn btn-sm btn-square btn-ghost text-error">
+                    <button @click="removeProduct(orderStore.products.indexOf(p))" class="btn btn-sm btn-square btn-ghost text-error">
                         <font-awesome-icon icon="trash" />
                     </button>
                 </div>
@@ -93,7 +93,8 @@
         </div>
 
         <div class="bg-base-200 p-2 flex justify-end">
-            <button @click="saveOrder()" class="btn btn-sm btn-error btn-outline">Pagar</button>
+            <button @click="orderStore.$reset()" class="btn btn-sm btn-outline">Cancelar venda</button>
+            <button @click="saveOrder()" class="btn btn-sm btn-error">Pagar</button>
         </div>
 
         <div class="modal modal-open" v-if="createModalOpen">
@@ -104,7 +105,7 @@
 
         <div class="modal modal-open" v-if="paymentModalOpen">
             <div class="modal-box max-w-2xl">
-                <sell-payment-modal v-if="order?.payment" :payment="order?.payment" @paid="amount => orderPaid(amount)" @close="paymentModalOpen = false" />
+                <sell-payment-modal v-if="orderStore.order?.payment" :payment="orderStore.order?.payment" @paid="amount => orderPaid(amount)" @close="paymentModalOpen = false" />
             </div>
             <div class="modal-toggle">
                 <button @click="paymentModalOpen = false" class="btn">Close</button>
@@ -115,10 +116,10 @@
 
 <script lang="ts">
     import { defineComponent, ref, computed } from 'vue'
-    import Order from '../../interfaces/orders/order.interface'
     import { OrderStatus } from '../../interfaces/orders/order.interface'
     import { Product } from '../../interfaces/products/product.interface'
     import { useStore } from '../../stores/auth'
+    import { useOrderStore } from '../../stores/order'
     import SellProductsModal from './SellProductsModal.vue'
     import SellPaymentModal from './SellPaymentModal.vue'
     import { useRouter } from 'vue-router'
@@ -127,11 +128,6 @@
     import swal from 'sweetalert'
     import { maxValue, minValue, required } from '@vuelidate/validators'
     import useVuelidate from '@vuelidate/core'
-
-    interface ProductWithQuantity {
-        quantity: number;
-        data: Product;
-    }
 
     export default defineComponent({
     components: {
@@ -142,13 +138,11 @@
         get_price,
     },
     setup() {
+        const orderStore = useOrderStore()
         const store = useStore()
         const router = useRouter()
 
         const selectedProduct = ref<Product>()
-        const products = ref<ProductWithQuantity[]>([])
-
-        const order = ref<Order>()
 
         const state = ref({
             details: '',
@@ -170,7 +164,7 @@
         const createModalOpen = ref(false);
         const paymentModalOpen = ref(false);
         const price = computed(() => {
-            return products.value.reduce((prev: number, current) => {
+            return orderStore.products.reduce((prev: number, current) => {
                 const price = prev + (parseFloat(current.data.price) * current.quantity)
                 return price
             }, 0)
@@ -180,16 +174,19 @@
             try {
                 if(!store.id) return
 
-                if (order?.value?.id) return
+                if (orderStore.order?.id) {
+                    router.push(`/sell/order/${orderStore.order?.id}`)
+                    return orderStore.$reset()
+                }
 
-                order.value = {
+                orderStore.order = {
                     user: store.id,
                     details: state.value.details,
                     payment: {
                         amount: price.value.toFixed(2),
                         is_paid: false,
                     },
-                    products: products.value.map(p => {
+                    products: orderStore.products.map(p => {
                         return {
                             quantity: p.quantity,
                             product: p.data.id
@@ -197,9 +194,7 @@
                     })
                 }
 
-                const response = await OrderService().create(order.value)
-                order.value = response
-
+                await orderStore.save()
                 paymentModalOpen.value = true
             }
             catch (e) {
@@ -208,19 +203,20 @@
         }
 
         const orderPaid = async (amount: number) => {
-            if (!order.value) return
+            if (!orderStore.order) return
 
-            if (!order.value.id) return
+            if (!orderStore.order.id) return
 
-            if(parseFloat(order.value.payment.amount) <= amount)
-                order.value.payment.is_paid = true
+            if(parseFloat(orderStore.order.payment.amount) <= amount)
+                orderStore.order.payment.is_paid = true
 
-            order.value.status = OrderStatus.Done
-            delete order.value.coupon
+            orderStore.order.status = OrderStatus.Done
+            delete orderStore.order.coupon
 
             try {
-                await OrderService().update(order.value.id, order.value)
+                await OrderService().update(orderStore.order.id, orderStore.order)
                 await swal('Sucesso', 'Venda concluída', 'success')
+                orderStore.$reset()
                 router.push('/sell')
             }
             catch(e) {
@@ -240,14 +236,14 @@
 
             if(!selectedProduct.value.id) return
 
-            const result = products.value.findIndex((product) => product.data.id == selectedProduct.value?.id)
+            const result = orderStore.products.findIndex((product) => product.data.id == selectedProduct.value?.id)
             if(result !== -1) {
-                products.value[result] = {
+                orderStore.products[result] = {
                     data: selectedProduct.value,
                     quantity: state.value.product.quantity
                 }
             } else {
-                products.value.push({
+                orderStore.products.push({
                     data: selectedProduct.value,
                     quantity: state.value.product.quantity
                 })
@@ -262,13 +258,12 @@
         }
 
         const removeProduct = (index: number) => {
-            products.value.splice(index, 1)
+            orderStore.products.splice(index, 1)
         }
 
         return {
             state,
             selectedProduct,
-            order,
             saveOrder,
             createModalOpen,
             paymentModalOpen,
@@ -276,10 +271,10 @@
             searchProduct,
             removeProduct,
             preloadProduct,
-            products,
             price,
             orderPaid,
             v$,
+            orderStore,
         };
     },
 })

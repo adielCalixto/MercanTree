@@ -1,6 +1,13 @@
 <template>
     <div>
-        <mt-table :table="table">
+        <div v-if="products.count === 0">
+            <p class="text-lg font-semibold">Nenhum produto encontrado</p>
+            <router-link to="/products/create">
+                Cadastrar produto
+                <font-awesome-icon icon="external-link" />
+            </router-link>
+        </div>
+        <mt-table class="overflow-y-auto relative max-h-72" :table="table" v-else>
             <tr v-for="product in products.results">
                 <th>
                     <button @click="$emit('selected', product)" class="btn btn-sm btn-square">
