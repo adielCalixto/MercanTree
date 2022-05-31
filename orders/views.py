@@ -26,7 +26,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
     filterset_class = OrderFilter
-    ordering_fields = ['created', 'price']
+    ordering_fields = ['created', 'payment__is_paid']
     ordering = ['-created']
 
     @action(methods=['get'], detail='true')

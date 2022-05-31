@@ -9,6 +9,8 @@
             @change="listOrders()"
             class="select select-sm select-bordered ml-auto mr-4">
                 <option value="" disabled selected>Ordenar</option>
+                <option value="payment__is_paid">Pagamento pendente-ASC</option>
+                <option value="-payment__is_paid">Pagamento pendente-DESC</option>
                 <option value="created">Data-ASC</option>
                 <option value="-created">Data-DESC</option>
             </select>
