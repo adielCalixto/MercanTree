@@ -1,3 +1,4 @@
+from xml.dom.expatbuilder import parseString
 from django.db import models
 from users.models import User
 from django.utils.translation import gettext_lazy as _
@@ -27,11 +28,14 @@ class CashRegister(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return self.details
+
 
 class Transaction(models.Model):
 
     class Type(models.TextChoices):
-        CASH = 'CI', _('Cash')
+        CASH = 'CI', _('Deposit')
         CASH_BACK = 'CB', _('Cashback')
 
 
