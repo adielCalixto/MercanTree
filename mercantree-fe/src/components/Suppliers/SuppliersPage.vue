@@ -1,11 +1,11 @@
 <template>
     <div>
-        <h1 class="text-xl mb-12">Lista de Fornecedores</h1>
+        <h1 class="text-xl mb-12 font-bold">Lista de Fornecedores</h1>
 
         <div class="my-4 flex justify-between">
             <router-link
             :to="$route.fullPath + '/create' "
-            class="btn btn-success btn-sm">
+            class="btn btn-success btn-sm text-primary">
                 Adicionar
             </router-link>
 
@@ -46,7 +46,7 @@
                 <th> {{ supplier.address }} </th>
                 <th> {{ supplier.cnpj }} </th>
                 <th>
-                    <router-link :to="`/suppliers/supplier/${supplier.id}`" class="btn btn-primary btn-sm">View</router-link>
+                    <router-link :to="`/suppliers/supplier/${supplier.id}`" class="btn btn-success btn-sm text-primary">View</router-link>
                 </th>
             </tr>
         </mt-table>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="text-2xl">Visualizar venda</h1>
+        <h1 class="text-2xl font-semibold">Visualizar venda</h1>
 
         <div class="tabs mb-8 ml-4">
             <a
@@ -14,7 +14,7 @@
             :class="{'tab-active': activeTab == 1}">Pagamento</a>
         </div>
 
-        <div v-if="activeTab == 0">
+        <div v-if="activeTab == 0" class="bg-base-200">
             <h2 class="text-lg font-semibold mb-4">Detalhes:</h2>
             <div class="flex flex-col gap-1 text-base">
                 <p>Data: <b>{{ new Date(order?.created ?? '').toLocaleString('pt-BR') }}</b></p>
@@ -39,7 +39,7 @@
             </div>
         </div>
 
-        <div v-else-if="activeTab == 1">
+        <div v-else-if="activeTab == 1" class="bg-base-200">
             <h2 class="text-lg font-semibold mb-4">Pagamento:</h2>
 
             <div>
@@ -50,11 +50,11 @@
             <form @submit.prevent="addAmount()" method="POST" class="flex gap-4 print:hidden my-4 justify-end">
                 <div class="form-control">
                     <input
-                    class="input input-sm input-primary"
+                    class="input input-sm input-success"
                     type="number"
                     v-model="formAmount">
                 </div>
-                <button type="submit" class="btn btn-success btn-sm">
+                <button type="submit" class="btn btn-success btn-sm text-primary">
                     Adicionar quantia
                     <font-awesome-icon icon="add" />
                 </button>
@@ -63,11 +63,11 @@
             <form @submit.prevent="addAmount()" method="POST" class="flex gap-4 print:hidden my-4 justify-end">
                 <div class="form-control">
                     <input
-                    class="input input-sm input-primary"
+                    class="input input-sm input-success"
                     type="number"
                     v-model="formAmount">
                 </div>
-                <button type="submit" class="btn btn-success btn-sm">
+                <button type="submit" class="btn btn-success btn-sm text-primary">
                     Devolução
                     <font-awesome-icon icon="add" />
                 </button>

@@ -12,7 +12,7 @@
 
                 <div class="stat-value mr-4">List of transactions</div>
 
-                <a href="" class="btn btn-sm absolute right-4 top-4">View all</a>
+                <a href="" class="btn btn-sm absolute  text-primary right-4 top-4">View all</a>
 
                 <div class="overflow-x-auto place-self-center w-full mt-4">
                     <table class="table table-compact w-full">

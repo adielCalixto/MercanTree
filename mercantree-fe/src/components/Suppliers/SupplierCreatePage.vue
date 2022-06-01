@@ -1,12 +1,12 @@
 <template>
     <div>
-        <h1 class="text-2xl mb-12">Adicionar fornecedor</h1>
-        <h2 class="mb-4">Preencha todos os campos e escolha uma das ações.</h2>
+        <h1 class="text-2xl mb-12 font-bold">Adicionar fornecedor</h1>
+        <h2 class="mb-4 font-semibold">Preencha todos os campos e escolha uma das ações.</h2>
 
         <form class="relative" @keydown="(e) => e.key == 'Enter' ? e.preventDefault() : e">
             <div class="flex gap-4 my-4">
                 <label class="label">
-                    <span class="label-text">* Nome:</span>
+                    <span class="label-text font-semibold">Nome:</span>
                 </label>
                 <input
                 v-model="supplier.name"
@@ -19,7 +19,7 @@
 
             <div class="flex gap-4 my-4">
                 <label class="label">
-                    <span class="label-text">* Responsável:</span>
+                    <span class="label-text font-semibold">Responsável:</span>
                 </label>
                 <input
                 v-model="supplier.responsable"
@@ -32,7 +32,7 @@
 
             <div class="flex gap-4 my-4">
                 <label class="label">
-                    <span class="label-text">Email:</span>
+                    <span class="label-text font-semibold">Email:</span>
                 </label>
                 <input
                 v-model="supplier.email"
@@ -45,7 +45,7 @@
 
             <div class="flex gap-4 my-4">
                 <label class="label">
-                    <span class="label-text">Telefone:</span>
+                    <span class="label-text font-semibold">Telefone:</span>
                 </label>
                 <input
                 v-model="supplier.phone"
@@ -58,7 +58,7 @@
 
             <div class="flex gap-4 my-4">
                 <label class="label">
-                    <span class="label-text">* Cidade:</span>
+                    <span class="label-text font-semibold">Cidade:</span>
                 </label>
                 <input
                 v-model="supplier.city"
@@ -71,14 +71,14 @@
 
             <div class="flex gap-4 my-4">
                 <label class="label">
-                    <span class="label-text">Endereço:</span>
+                    <span class="label-text font-semibold">Endereço:</span>
                 </label>
                 <input v-model="supplier.address" type="text" class="input max-w-md input-sm input-bordered">
             </div>
 
             <div class="flex gap-4 my-4">
                 <label class="label">
-                    <span class="label-text">CNPJ:</span>
+                    <span class="label-text font-semibold">CNPJ:</span>
                 </label>
                 <input
                 v-model="supplier.cnpj"
@@ -90,8 +90,8 @@
             </div>
 
             <div class="flex justify-end gap-4 bg-base-200 p-4">
-                <button class="btn btn-secondary btn-outline btn-sm" @click.prevent="createProduct()">Salvar e adicionar outro</button>
-                <button class="btn btn-primary btn-sm" @click.prevent="createProduct(true)">Salvar</button>
+                <button class="btn btn-info btn-outline btn-sm" @click.prevent="createProduct()">Salvar e adicionar outro</button>
+                <button class="btn btn-success btn-sm text-primary" @click.prevent="createProduct(true)">Salvar</button>
             </div>
         </form>
     </div>

@@ -40,7 +40,7 @@
                                     :ref="(el) => { states.editingFields[c.id??0] = el}"
                                     v-model="c.name" />
 
-                                    <button class="btn btn-sm btn-success btn-square" @click="editCategory(c.id)">
+                                    <button class="btn btn-sm btn-info btn-square" @click="editCategory(c.id)">
                                         <font-awesome-icon icon="check" />
                                     </button>
                                 </div>

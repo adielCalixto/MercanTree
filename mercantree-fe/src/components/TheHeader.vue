@@ -11,7 +11,7 @@
         <div class="flex-none relative print:hidden">
             <a @click="showUserInfo = !showUserInfo" class="btn btn-neutral btn-square btn-sm"><font-awesome-icon icon="user-check" /></a>
 
-            <div v-if="showUserInfo" class="bg-neutral rounded text-center text-neutral-content p-2 absolute mt-1 right-0 top-full w-40">
+            <div v-if="showUserInfo" class="bg-neutral rounded text-center text-primary p-2 absolute mt-1 right-0 top-full w-40">
                 <p class="text-lf font-bold">{{ username }}</p>
                 <router-link to="/account" class="link text-sm mt-4">
                     Detalhes 

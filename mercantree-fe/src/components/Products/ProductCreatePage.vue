@@ -1,12 +1,12 @@
 <template>
     <div>
-        <h1 class="text-2xl mb-12">Adicionar produto</h1>
-        <h2 class="mb-4">Preencha todos os campos e escolha uma das ações.</h2>
+        <h1 class="font-bold text-2xl mb-12">Adicionar produto</h1>
+        <h2 class="mb-4 font-semibold">Preencha todos os campos e escolha uma das ações.</h2>
 
         <form class="relative" @keydown="(e) => e.key == 'Enter' ? e.preventDefault() : e">
             <div class="flex gap-4">
                 <label class="label">
-                    <span class="label-text">* Nome:</span>
+                    <span class="label-text font-semibold">Nome:</span>
                 </label>
 
                 <input
@@ -20,7 +20,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Descrição:</span>
+                    <span class="label-text font-semibold">Descrição:</span>
                 </label>
 
                 <input
@@ -30,7 +30,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Categoria:</span>
+                    <span class="label-text  font-semibold">Categoria:</span>
                 </label>
 
                 <v-select
@@ -40,13 +40,13 @@
                 :reduce="categoryReducer"
                 :options="categories.results" />
                 
-                <button type="button" @click="editCategories = true" class="btn btn-sm btn-square">
+                <button type="button" @click="editCategories = true" class="btn btn-sm btn-square btn-success">
                     <font-awesome-icon icon="edit" />
                 </button>
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">* Preço:</span>
+                    <span class="label-text font-semibold">Preço:</span>
                 </label>
 
                 <input
@@ -61,7 +61,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">* Preço de custo:</span>
+                    <span class="label-text font-semibold">Preço de custo:</span>
                 </label>
 
                 <input
@@ -76,7 +76,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">* Quantidade:</span>
+                    <span class="label-text font-semibold">Quantidade:</span>
                 </label>
 
                 <input
@@ -91,7 +91,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Validade:</span>
+                    <span class="label-text font-semibold">Validade:</span>
                 </label>
                 <input
                 v-model="product.expires_at"
@@ -100,7 +100,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Código de barras:</span>
+                    <span class="label-text font-semibold">Código de barras:</span>
                 </label>
 
                 <input
@@ -110,7 +110,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Fornecedor</span>
+                    <span class="label-text font-semibold">Fornecedor</span>
                 </label>
 
                 <v-select
@@ -121,8 +121,8 @@
                 :options="suppliers.results" />
             </div>
             <div class="flex justify-end gap-4 bg-base-200 p-4">
-                <button class="btn btn-secondary btn-outline btn-sm" @click.prevent="createProduct()">Salvar e adicionar outro</button>
-                <button class="btn btn-primary btn-sm" @click.prevent="createProduct(true)">Salvar</button>
+                <button class="btn btn-info btn-outline btn-sm" @click.prevent="createProduct()">Salvar e adicionar outro</button>
+                <button class="btn btn-success btn-sm  text-primary" @click.prevent="createProduct(true)">Salvar</button>
             </div>
         </form>
 

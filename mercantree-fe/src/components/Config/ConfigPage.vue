@@ -1,15 +1,15 @@
 <template>
-    <div class="relative md:ml-48 overflow-y-auto container max-w-full">
+    <div class="relative md:ml-48 overflow-y-auto container max-h-full">
         <div class="max-w-xl">
             <div class="mb-4 flex flex-col gap-4">
-                <h1 class="text-2xl mb-8">Perfil</h1>
+                <h1 class="text-2xl mb-8 font-bold">Perfil</h1>
 
-                <div class="grid grid-cols-2 text-md">
+                <div class="grid grid-cols-2 text-md font-semibold">
                     <p>Nome:</p>
                     <p class="font-semibold place-self-end">{{ authStore.username }}</p>
                 </div>
 
-                <div class="grid grid-cols-2 text-md">
+                <div class="grid grid-cols-2 text-md font-semibold ">
                     <div>
                         <p>Pagina do administrador:</p>
                     </div>
@@ -28,15 +28,15 @@
             <div class="divider"></div>
 
             <div class="profile-section mb-4 flex flex-col gap-4">
-                <h1 class="text-2xl mb-8">Tema</h1>
+                <h1 class="text-2xl mb-8 font-bold ">Tema</h1>
 
-                <div class="grid grid-cols-2 text-md">
+                <div class="grid grid-cols-2 text-md font-semibold">
                     <p>Tema escuro:</p>
 
                     <div class="form-control place-self-end">
                         <input
                         type="checkbox"
-                        class="toggle toggle-primary"
+                        class="toggle toggle-neutral bg-success"
                         v-model="state.theme"
                         @change="setTheme()" />
                     </div>
@@ -46,15 +46,15 @@
             <div class="divider"></div>
 
             <div class="profile-section mb-4 flex flex-col gap-4">
-                <h1 class="text-2xl mb-8">Funcionalidades</h1>
+                <h1 class="text-2xl mb-8 font-bold">Funcionalidades</h1>
 
-                <div class="grid grid-cols-2 text-md">
+                <div class="grid grid-cols-2 text-md font-semibold">
                     <p>Auto adicionar produto na venda quando o resultado da busca for 1</p>
 
                     <div class="form-control place-self-end">
                         <input
                         type="checkbox"
-                        class="toggle toggle-primary"
+                        class="toggle toggle-neutral bg-success"
                         v-model="state.auto_add_product"
                         @change="setAutoAddProduct()" />
                     </div>

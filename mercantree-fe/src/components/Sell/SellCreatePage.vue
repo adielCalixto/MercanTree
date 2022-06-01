@@ -5,7 +5,7 @@
                 <form @submit.prevent="searchProduct()" method="post">
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text">(Nome, Código de barras, Descrição)</span>
+                            <span class="label-text font-semibold">(Nome, Código de barras, Descrição)</span>
                         </label>
 
                         <input
@@ -33,7 +33,7 @@
                     </div>
 
                     <div>
-                        <button @click="addProduct()" class="btn btn-square btn-sm">+</button>
+                        <button @click="addProduct()" class="btn btn-square btn-sm btn-success text-primary">+</button>
                     </div>
 
                     <div
@@ -62,14 +62,14 @@
         <div class="grid grid-cols-2 gap-4">
             <div class="details bg-base-200">
                 <textarea
-                class="textarea textarea-primary w-full h-full resize-none"
+                class="textarea textarea-success w-full h-full resize-none"
                 placeholder="Observações..."
                 v-model="state.details"
                 ></textarea>
             </div>
 
             <div class="prices bg-base-200">
-                <div class="bg-base-300 p-4">
+                <div class="bg-base-200 p-4">
                     <div class="text-md text-gray-600 flex justify-between">
                         <p>Subtotal</p>
                         <p>R${{ price }}</p>
@@ -93,7 +93,7 @@
         </div>
 
         <div class="bg-base-200 p-2 flex justify-end">
-            <button @click="saveOrder()" class="btn btn-sm btn-error btn-outline">Pagar</button>
+            <button @click="saveOrder()" class="btn btn-sm btn-info btn-outline">Pagar</button>
         </div>
 
         <div class="modal modal-open" v-if="createModalOpen">

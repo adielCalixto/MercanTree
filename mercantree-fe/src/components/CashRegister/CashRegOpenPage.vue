@@ -14,12 +14,12 @@
                     type="number"
                     min="0"
                     v-model="state.amount"
-                    class="input input-sm input-primary">
+                    class="input input-sm input-success">
                 </div>
 
                 <div class="flex gap-4 justify-end mt-8">
                     <button
-                    class="btn btn-primary btn-outline"
+                    class="btn btn-info btn-outline"
                     type="submit">
                         Confirmar
                     </button>

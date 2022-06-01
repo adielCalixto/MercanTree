@@ -31,7 +31,7 @@
         </div>
 
         <div class="w-full">
-            <h1 class="text-xl mb-12">Transações do caixa atual</h1>
+            <h1 class="text-xl mb-12 font-bold">Transações do caixa atual</h1>
 
             <div class="my-4 flex justify-between">
                 <select @change=""
@@ -66,7 +66,7 @@
                     <h3 class="font-bold text-lg">Adicionar dinheiro ao caixa</h3>
 
                     <div class="modal-action">
-                        <a @click="depositCash()" class="btn btn-primary btn-sm">Salvar</a>
+                        <a @click="depositCash()" class="btn btn-info btn-sm">Salvar</a>
                         <a @click="openModal = modalList.NONE"
                         class="btn btn-outline btn-error btn-sm">Cancelar</a>
                     </div>
@@ -105,7 +105,7 @@
                     <h3 class="font-bold text-lg">Retirar dinheiro do caixa</h3>
 
                     <div class="modal-action">
-                        <a @click="removeCash()" class="btn btn-primary btn-sm">Salvar</a>
+                        <a @click="removeCash()" class="btn btn-info btn-sm">Salvar</a>
                         <a @click="openModal=modalList.NONE"
                         class="btn btn-outline btn-error btn-sm">Cancelar</a>
                     </div>
@@ -169,7 +169,7 @@
                         <div class="form-control">
                             <label class="label">Valor em caixa:</label>
                             <input
-                            class="input input-primary input-sm"
+                            class="input input-success input-sm"
                             type="number"
                             min="0"
                             v-model="state.close.amount">
@@ -181,7 +181,7 @@
 
                     <div class="modal-action">
                         <a @click="close()"
-                        class="btn btn-warning btn-sm">Confirmar</a>
+                        class="btn btn-info btn-sm">Confirmar</a>
 
                         <a @click="openModal=modalList.NONE"
                         class="btn btn-outline btn-error btn-sm">Cancelar</a>

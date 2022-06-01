@@ -11,16 +11,16 @@ module.exports = {
         themes: [
             {
                 mercantree: {
-                    primary: "#245E8A",
-                    secondary: "#40719C",
-                    success: "#6DECAF",
-                    neutral: "#122A3B",
-                    error: "#F25F5C",
-                    info: "#6470FA",
-                    warning: "#F2CD5D",
-                    "base-100": "#ffffff",
-                    "base-200": "#f7f7f7",
-                    "base-300": "#DDDDDD",
+                    primary: "#ffffff", //branco
+                    secondary: "#48bb78", // verde logo
+                    success: "#0B2044", // azul escuro
+                    neutral: "#000000", // preto"
+                    error: "#d90429", // vermelho
+                    info: "#31CC19", //  verde
+                    warning: "#ffc300", // amarelo
+                    "base-100": "#ffffff", // branco
+                    "base-200": "#e5e5e5", // cinza
+                    "base-300": "#14213d", // azul escuro
                     
                     "--rounded-box": "0.225rem", // border radius rounded-box utility class, used in card and other large boxes
                     "--rounded-btn": ".225rem", // border radius rounded-btn utility class, used in buttons and similar element
@@ -34,7 +34,7 @@ module.exports = {
                     "--tab-radius": "0.5rem", // border radius of tabs
                 },
             },
-            'business',
+            'business', 'luxury',
         ]
     }
 }

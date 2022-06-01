@@ -6,7 +6,7 @@
         <form class="relative" @keydown="(e) => e.key == 'Enter' ? e.preventDefault() : e">
             <div class="flex gap-4">
                 <label class="label">
-                    <span class="label-text">* Nome:</span>
+                    <span class="label-text font-semibold">Nome:</span>
                 </label>
 
                 <input
@@ -20,7 +20,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Descrição:</span>
+                    <span class="label-text font-semibold">Descrição:</span>
                 </label>
 
                 <input
@@ -30,7 +30,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Categoria:</span>
+                    <span class="label-text font-semibold">Categoria:</span>
                 </label>
 
                 <v-select
@@ -46,7 +46,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">* Preço:</span>
+                    <span class="label-text font-semibold">Preço:</span>
                 </label>
 
                 <input
@@ -61,7 +61,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">* Preço de custo:</span>
+                    <span class="label-text font-semibold">Preço de custo:</span>
                 </label>
 
                 <input
@@ -76,7 +76,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">* Quantidade:</span>
+                    <span class="label-text font-semibold">Quantidade:</span>
                 </label>
 
                 <input
@@ -91,7 +91,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Quantidade em estoque:</span>
+                    <span class="label-text font-semibold">Quantidade em estoque:</span>
                 </label>
 
                 <input
@@ -103,7 +103,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Validade:</span>
+                    <span class="label-text font-semibold">Validade:</span>
                 </label>
                 <input
                 v-model="product.expires_at"
@@ -112,7 +112,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Código de barras:</span>
+                    <span class="label-text font-semibold">Código de barras:</span>
                 </label>
 
                 <input
@@ -122,7 +122,7 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">Fornecedor</span>
+                    <span class="label-text font-semibold">Fornecedor</span>
                 </label>
 
                 <v-select
@@ -134,7 +134,7 @@
             </div>
             <div class="flex justify-end gap-4 bg-base-200 p-4">
                 <button class="btn btn-error btn-outline btn-sm" @click.prevent="deleteProduct()">Deletar</button>
-                <button class="btn btn-secondary btn-sm" @click.prevent="updateProduct()">Salvar</button>
+                <button class="btn btn-success btn-sm text-primary" @click.prevent="updateProduct()">Salvar</button>
             </div>
         </form>
 

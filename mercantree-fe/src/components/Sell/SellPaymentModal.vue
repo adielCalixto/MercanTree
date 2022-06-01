@@ -1,8 +1,8 @@
 <template>
     <div>
-        <h1 class="text-xl text-base-content mb-8">Tipo de pagamento</h1>
+        <h1 class="text-xl text-base-content mb-8 font-bold">Tipo de pagamento</h1>
         <div class="collapse collapse-open">
-            <div class="collapse-title bg-primary text-primary-content">
+            <div class="collapse-title bg-primary text-primary-content font-semibold">
                 Dinheiro
             </div>
             <div class="collapse-content bg-base-200 text-nase-content"> 
@@ -27,7 +27,7 @@
                     </div>
 
                     <div class="bg-base-200 p-2 mt-8 flex justify-end">
-                        <button type="submit" class="btn btn-sm btn-primary btn-outline">Confirmar</button>
+                        <button type="submit" class="btn btn-sm btn-info text-neutral btn-outline">Confirmar</button>
                     </div>
                 </form>
             </div>

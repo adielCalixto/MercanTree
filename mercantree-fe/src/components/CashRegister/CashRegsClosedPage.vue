@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="text-2xl mb-8">Caixas fechados</h1>
+        <h1 class="text-2xl mb-8 font-bold">Caixas fechados</h1>
 
         <div v-if="cashRegisters.length == 0">
             Nenhum caixa encontrado
@@ -13,7 +13,7 @@
             :key="cr.cashRegister.id"
             :class="{'collapse-open': cr.open}">
                 <div
-                class="collapse-title flex items-center justify-between min-h-0 py-2 bg-base-300 text-base-content">
+                class="collapse-title flex items-center justify-between min-h-0 py-2 bg-base-200 text-base-content font-semibold">
                     <p class="text-lg flex-1">Caixa do dia {{ format_date(cr.cashRegister.created) }}</p>
 
                     <div
@@ -21,11 +21,11 @@
                     class="tabs tabs-boxed p-0 mr-4">
                         <a
                         @click="cr.tab = crTab.Informações"
-                        class="tab tab-sm"
+                        class="tab tab-sm text-neutral"
                         :class="{'tab-active': cr.tab == crTab.Informações}">Informações</a> 
                         <a
                         @click="goToTransactions(cr.cashRegister.id)"
-                        class="tab tab-sm"
+                        class="tab tab-sm text-neutral"
                         :class="{'tab-active': cr.tab == crTab.Transações}">Transações</a>
                     </div>
 
@@ -38,7 +38,7 @@
                 <div class="collapse-content bg-base-200 text-base-content">
                     <div v-if="cr.tab == crTab.Informações" class="flex flex-col sm:flex-row gap-4 py-4">
                         <div class="w-1/3">
-                            <h3 class="text-lg font-semibold text-gray-500 mb-2">Movimentação:</h3>
+                            <h3 class="text-lg font-semibold text-neutral mb-2">Movimentação:</h3>
                             <p class="text-md my-1">
                                 Valor inicial: <b>{{ cr.cashRegister.initial_amount }}</b>
                             </p>
@@ -47,7 +47,7 @@
                             </p>
                         </div>
                         <div class="w-2/3">
-                            <h3 class="text-lg font-semibold text-gray-500 mb-2">Outras informações:</h3>
+                            <h3 class="text-lg font-semibold text-neutral mb-2">Outras informações:</h3>
                             <p class="text-lg my-1">
                                 Usuário: <b>{{ cr.cashRegister.user }}</b>
                             </p>
@@ -58,7 +58,7 @@
                     </div>
 
                     <div v-else class="">
-                        <h3 class="text-lg font-semibold text-gray-500 my-4">Transações:</h3>
+                        <h3 class="text-lg font-semibold text-neutral my-4">Transações:</h3>
                         <table class="w-full" align="center">
                             <thead>
                                 <tr>

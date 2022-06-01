@@ -1,9 +1,9 @@
 <template>
     <div>
-        <h1 class="text-xl mb-12">Lista de Produtos</h1>
+        <h1 class="text-xl mb-12 font-bold">Lista de Produtos</h1>
 
         <div class="my-4 flex justify-between">
-            <router-link :to="$route.fullPath + '/create'" class="btn btn-success btn-sm">Adicionar</router-link>
+            <router-link :to="$route.fullPath + '/create'" class="btn btn-success btn-sm text-primary">Adicionar</router-link>
             <select v-model="ordering"
             @change="listProducts()"
             class="select select-sm select-bordered ml-auto mr-4">
@@ -46,9 +46,9 @@
                     <router-link v-if="product.supplier_id" :to="`/suppliers/supplier/${product.supplier_id}`" class="btn btn-rounded btn-sm">
                         <font-awesome-icon icon="external-link" />
                     </router-link>
-                </th>
+                </th> 
                 <th>
-                    <router-link :to="`/products/product/${product.id}`" class="btn btn-primary btn-sm">View</router-link>
+                    <router-link :to="`/products/product/${product.id}`" class="btn btn-success btn-sm text-primary">View</router-link>
                 </th>
             </tr>
         </mt-table>
