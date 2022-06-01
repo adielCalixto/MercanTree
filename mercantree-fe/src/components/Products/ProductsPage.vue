@@ -12,6 +12,8 @@
                 <option value="-name">Nome-DESC</option>
                 <option value="price">Preço-ASC</option>
                 <option value="-price">Preço-DESC</option>
+                <option value="expires_at">Data de validade-ASC</option>
+                <option value="-expires_at">Data de validade-DESC</option>
             </select>
             <div class="form-control">
                 <div class="input-group">

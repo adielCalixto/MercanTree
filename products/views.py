@@ -21,8 +21,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     filter_backends = [SearchFilter, filters.DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     search_fields = ['name', 'barcode']
-    ordering_fields = ['name', 'created', 'price']
-    ordering = ['name']
+    ordering_fields = ['name', 'created', 'price', 'expires_at']
+    ordering = ['expires_at', 'name']
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
