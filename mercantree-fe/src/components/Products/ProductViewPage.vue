@@ -201,6 +201,9 @@ export default defineComponent({
                 isLoading.value = true
                 const response = await productsService().retrieve(id)
                 product.value = response
+                if(response.expires_at) {
+                    product.value.expires_at = new Date(response.expires_at).toISOString().substring(0, 10)
+                }
                 isLoading.value = false
             } catch(e) {
                 router.push('/products')
