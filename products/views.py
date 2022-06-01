@@ -1,7 +1,10 @@
+from datetime import date, timedelta
 from .models import Category, Product, Supplier
-from rest_framework import viewsets, permissions, mixins
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
 from .serializers import CategorySerializer, ProductSerializer, SupplierSerializer
 from rest_framework.filters import SearchFilter
+from rest_framework.decorators import action
 from django_filters import rest_framework as filters
 from rest_framework.filters import OrderingFilter
 
@@ -23,6 +26,21 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'barcode']
     ordering_fields = ['name', 'created', 'price', 'expires_at']
     ordering = ['expires_at', 'name']
+
+
+    @action(methods=['GET'], detail=False)
+    def next_to_expiration(self, request):
+        start_date = date.today()
+        end_date = start_date + timedelta(days=6)
+        products = Product.objects.filter(expires_at__range=[start_date, end_date])
+        
+        page = self.paginate_queryset(products)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(products, many=True)
+        return Response(serializer.data)
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
