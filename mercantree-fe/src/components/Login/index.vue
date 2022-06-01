@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-base-200 h-screen py-16">
-        <div class="max-w-md mx-auto p-4 bg-primary rounded-box">
+    <div class="bg-base-300 h-screen py-16">
+        <div class="max-w-md mx-auto p-4 bg-base-100 rounded-box">
             <div class="text-center py-2 text-neutral">
                 <h1 class="text-xl font-bold">Mercan<span class="text-green-500 font-bold">Tree</span> | Login</h1>
             </div>
@@ -8,7 +8,7 @@
             <form @submit.prevent="login" class="p-4">
                 <div class="form-control w-full">
                     <label class="label">
-                        <span class="label-text font-semibold">Email</span>
+                        <span class="label-text font-semibold text-neutral">Email</span>
                     </label>
 
                     <input
@@ -23,7 +23,7 @@
                 </div>
                 <div class="form-control w-full my-4">
                     <label class="label">
-                        <span class="label-text font-semibold">Senha</span>
+                        <span class="label-text font-semibold text-neutral">Senha</span>
                     </label>
 
                     <input

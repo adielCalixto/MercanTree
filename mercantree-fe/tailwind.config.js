@@ -8,7 +8,7 @@ module.exports = {
     },
     plugins: [require("daisyui")],
     daisyui: {
-        themes: [
+        themes: ['business', 
             {
                 mercantree: {
                     primary: "#ffffff", //branco
@@ -34,7 +34,6 @@ module.exports = {
                     "--tab-radius": "0.5rem", // border radius of tabs
                 },
             },
-            'business', 'luxury',
         ]
     }
 }

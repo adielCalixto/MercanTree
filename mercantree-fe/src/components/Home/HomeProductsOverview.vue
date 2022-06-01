@@ -1,6 +1,6 @@
 <template>
   <div class="mt-8">
-      <h1 class="text-2xl font-bold text-neutral mb-4">Acquisition Overview</h1>
+      <h1 class="text-2xl font-bold text-neutral mb-4">Última Aquisição</h1>
 
       <div class="overflow-x-auto">
         <table class="table w-full">
