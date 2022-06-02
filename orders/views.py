@@ -1,14 +1,14 @@
-from rest_framework import viewsets, status
+from django.utils import timezone
+from rest_framework import viewsets
 from rest_framework import permissions
+from django.db.models import Sum
+from payments.models import Payment
 from .models import Order, OrderProduct, Coupon
 from .serializers import OrderSerializer, OrderProductSerializer, CouponSerializer
 from django_filters import rest_framework as filters
 from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from payments.models import Payment
-from payments.serializers import PaymentSerializer
-from django.core.exceptions import ObjectDoesNotExist
 
 
 class OrderFilter(filters.FilterSet):
@@ -29,38 +29,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created', 'payment__is_paid']
     ordering = ['-created']
 
-    @action(methods=['get'], detail='true')
-    def products(self, request, pk=None):
-        products = OrderProduct.objects.filter(order=pk)
-        page = self.paginate_queryset(products)
+    @action(methods=['GET'], detail=False)
+    def week_payment_amount(self, request):
+        end_date = timezone.now()
+        start_date = end_date - timezone.timedelta(days=6)
+        payment_amount = Payment.objects.filter(created__range=[start_date, end_date]).aggregate(Sum('amount'))
+        amount = payment_amount['amount__sum'] if payment_amount['amount__sum'] else 0
 
-        if page is not None:
-            serializer = OrderProductSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = OrderProductSerializer(products, many=True)
-        return Response(serializer.data)
-
-
-    @action(methods=['get'], detail='true')
-    def payment(self, request, pk=None):
-        order = self.get_object()
-        payment = Payment.objects.get(id=order.payment.id)
-
-        serializer = PaymentSerializer(payment)
-        return Response(serializer.data)
-        
-
-    @action(methods=['get'], detail='true')
-    def coupon(self, request, pk=None):
-        order = self.get_object()
-        if order.coupon is None:
-            return Response({'details': 'Order has no coupon'},
-            status=status.HTTP_400_BAD_REQUEST)
-        coupon = Coupon.objects.get(code=order.coupon.code)
-
-        serializer = CouponSerializer(coupon)
-        return Response(serializer.data)
+        return Response({'amount': amount})
 
 
 class OrderProductViewSet(viewsets.ModelViewSet):
