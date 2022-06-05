@@ -13,6 +13,7 @@
                     <input
                     type="number"
                     min="0"
+                    step="any"
                     v-model="state.amount"
                     class="input input-sm input-primary">
                 </div>

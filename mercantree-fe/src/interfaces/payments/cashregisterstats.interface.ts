@@ -1,6 +1,6 @@
 interface CashRegisterStats {
-    initial_amount: number;
-    final_amount: number;
+    initial_amount: string;
+    final_amount: string;
 }
 
 export default CashRegisterStats

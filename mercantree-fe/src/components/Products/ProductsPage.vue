@@ -40,7 +40,7 @@
                 <th> {{ product.name }} </th>
                 <th> {{ product.description }} </th>
                 <th> {{ format_date(product.expires_at) }} </th>
-                <th> {{ product.price }} </th>
+                <th> {{ get_price(product.price) }} </th>
                 <th> {{ product.barcode }} </th>
                 <th> {{ product.quantity }} </th>
                 <th> {{ product.category }} </th>
@@ -76,6 +76,7 @@ import { APIListResponse } from '../../interfaces/common/response.interface'
 import { RouterLink } from 'vue-router'
 import { PAGE_SIZE } from '../../consts'
 import format_date from "../../utils/format_date"
+import get_price from '../../utils/get_price'
 
 export default defineComponent({
     components: {
@@ -84,6 +85,7 @@ export default defineComponent({
     },
     methods: {
         format_date,
+        get_price,
     },
     async setup() {
         const table = {
@@ -93,7 +95,7 @@ export default defineComponent({
                 'Nome',
                 'Descrição',
                 'Validade',
-                'Price',
+                'Preço',
                 'Código de barras',
                 'Quantidade',
                 'Categoria',

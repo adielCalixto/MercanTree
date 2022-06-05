@@ -147,14 +147,14 @@
                     <div class="my-4 flex gap-4">
                         <div>
                             <p class="text text-base-content text-lg">Valor inicial:</p>
-                            <p class="text text-base-content font-bold text-xl">{{ store.stats?.initial_amount }}</p>
+                            <p class="text text-base-content font-bold text-xl">{{ get_price(store.stats?.initial_amount ?? '') }}</p>
                         </div>
 
                         <div class="divider divider-horizontal"></div>
 
                         <div>
                             <p class="text text-base-content text-lg">Valor estimado final:</p>
-                            <p class="text text-base-content font-bold text-xl">{{ store.stats?.final_amount }}</p>
+                            <p class="text text-base-content font-bold text-xl">{{ get_price(store.stats?.final_amount ?? '') }}</p>
                         </div>
                     </div>
 
