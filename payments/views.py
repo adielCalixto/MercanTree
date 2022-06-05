@@ -1,6 +1,6 @@
 import decimal
 from .models import Payment, Transaction, CashRegister
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,6 +10,10 @@ from django.db.models import Sum
 from rest_framework.filters import OrderingFilter
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+class ReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -46,7 +50,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class CashRegister(viewsets.ModelViewSet):
     queryset = CashRegister.objects.all()
     serializer_class = CashRegisterSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAdminUser|permissions.IsAuthenticated & ReadOnly]
     filter_backends = [filters.DjangoFilterBackend, OrderingFilter]
     ordering = ['-created']
     filterset_fields = ['open']
