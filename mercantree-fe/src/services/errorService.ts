@@ -19,6 +19,13 @@ export default function() {
                     })
                 break;
 
+                case 403:
+                    swal('Você não tem permissão para realizar essa ação', `${error.message} - ${error.code ?? ''}`, 'error')
+                    .then(() => {
+                        router.go(-1)
+                    })
+                break;
+
                 case 404:
                     swal('Servidor não encontrado.', `${error.message} - ${error.code ?? ''}`, 'error')
                     .then(() => {
