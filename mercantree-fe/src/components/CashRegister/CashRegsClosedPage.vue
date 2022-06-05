@@ -59,7 +59,12 @@
 
                     <div v-else class="">
                         <h3 class="text-lg font-semibold text-gray-500 my-4">Transações:</h3>
-                        <table class="w-full" align="center">
+                        <div
+                        class="text-sm font-semibold"
+                        v-if="cr.transactions?.count == 0">
+                            Nenhuma transação encontrada
+                        </div>
+                        <table class="w-full" align="center" v-else>
                             <thead>
                                 <tr>
                                     <th></th>
