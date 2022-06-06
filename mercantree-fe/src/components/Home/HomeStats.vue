@@ -12,7 +12,7 @@
 
                 <div class="stat-value mr-4">Lista de Compras</div>
 
-                <a href="" class="btn btn-sm absolute  text-secondary right-4 top-4">Ver Tudo</a>
+                <a href="" class="btn btn-sm absolute  text-neutral-content right-4 top-4">Ver Tudo</a>
 
                 <div class="overflow-x-auto place-self-center w-full mt-4">
                     <table class="table table-compact w-full">

@@ -8,7 +8,7 @@ module.exports = {
     },
     plugins: [require("daisyui")],
     daisyui: {
-        themes: ['business', 
+        themes: [ 
             {
                 mercantree: {
                     primary: "#ffffff", //branco
@@ -21,6 +21,8 @@ module.exports = {
                     "base-100": "#ffffff", // branco
                     "base-200": "#e5e5e5", // cinza
                     "base-300": "#14213d", // azul escuro
+                    "base-400": "#000000", // preto
+
                     
                     "--rounded-box": "0.225rem", // border radius rounded-box utility class, used in card and other large boxes
                     "--rounded-btn": ".225rem", // border radius rounded-btn utility class, used in buttons and similar element
@@ -32,8 +34,9 @@ module.exports = {
                     "--border-btn": "1px", // border width of buttons
                     "--tab-border": "1px", // border width of tabs
                     "--tab-radius": "0.5rem", // border radius of tabs
+                    "border": "1px", //
                 },
-            },
+            },'business',
         ]
     }
 }

@@ -35,7 +35,7 @@
 
                 <v-select
                 v-model="product.category"
-                class="w-full max-w-xs"
+                class="w-full max-w-xs text-neutral"
                 label="name"
                 :reduce="categoryReducer"
                 :options="categories.results" />
@@ -134,7 +134,7 @@
             </div>
             <div class="flex justify-end gap-4 bg-base-200 p-4">
                 <button class="btn btn-error btn-outline btn-sm" @click.prevent="deleteProduct()">Deletar</button>
-                <button class="btn btn-success btn-sm text-primary" @click.prevent="updateProduct()">Salvar</button>
+                <button class="btn btn-success btn-sm text-base-100" @click.prevent="updateProduct()">Salvar</button>
             </div>
         </form>
 

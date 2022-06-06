@@ -91,7 +91,7 @@
 
             <div class="flex justify-end gap-4 my-4 bg-base-200 p-4">
                 <button class="btn btn-error btn-outline btn-sm" @click.prevent="deleteProduct()">Deletar</button>
-                <button class="btn btn-success text-primary btn-sm" @click.prevent="updateProduct()">Salvar</button>
+                <button class="btn btn-success text-base-100 btn-sm" @click.prevent="updateProduct()">Salvar</button>
             </div>
         </form>
     </div>

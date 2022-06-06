@@ -31,7 +31,7 @@
                         <p>{{ order?.products.indexOf(p) }}</p>
                         <p>{{ p.product.name }}</p>
                         <div class="flex gap-4 ml-auto">
-                            <p class="text-gray-500">{{ p.quantity }} X {{ get_price(p.product.price) }}</p>
+                            <p class="text-base-400">{{ p.quantity }} X {{ get_price(p.product.price) }}</p>
                             <p class="font-bold">= R${{ (parseFloat(p.product.price) * p.quantity).toFixed(2) }}</p>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                     type="number"
                     v-model="formAmount">
                 </div>
-                <button type="submit" class="btn btn-success btn-sm text-primary">
+                <button type="submit" class="btn btn-success btn-sm text-base-400">
                     Adicionar quantia
                     <font-awesome-icon icon="add" />
                 </button>
@@ -67,7 +67,7 @@
                     type="number"
                     v-model="formAmount">
                 </div>
-                <button type="submit" class="btn btn-success btn-sm text-primary">
+                <button type="submit" class="btn btn-success btn-sm text-base-400">
                     Devolução
                     <font-awesome-icon icon="add" />
                 </button>

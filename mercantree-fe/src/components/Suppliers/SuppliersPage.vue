@@ -5,7 +5,7 @@
         <div class="my-4 flex justify-between">
             <router-link
             :to="$route.fullPath + '/create' "
-            class="btn btn-success btn-sm text-primary">
+            class="btn btn-success btn-sm text-base-100">
                 Adicionar
             </router-link>
 
@@ -46,7 +46,7 @@
                 <th> {{ supplier.address }} </th>
                 <th> {{ supplier.cnpj }} </th>
                 <th>
-                    <router-link :to="`/suppliers/supplier/${supplier.id}`" class="btn btn-success btn-sm text-primary">View</router-link>
+                    <router-link :to="`/suppliers/supplier/${supplier.id}`" class="btn btn-success btn-sm text-base-100">View</router-link>
                 </th>
             </tr>
         </mt-table>

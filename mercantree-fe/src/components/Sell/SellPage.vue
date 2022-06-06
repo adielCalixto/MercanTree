@@ -3,7 +3,7 @@
         <h1 class="text-xl mb-12 font-bold">Lista de Vendas</h1>
 
         <div class="my-4 flex justify-between">
-            <router-link to="/sell/create" class="btn btn-success btn-sm text-primary">Adicionar</router-link>
+            <router-link to="/sell/create" class="btn btn-success btn-sm text-base-100">Adicionar</router-link>
 
             <select v-model="ordering"
             @change="listOrders()"
@@ -30,7 +30,7 @@
                 </th>
                 <th>{{ order.user }}</th>
                 <th>
-                    <router-link :to="`/sell/order/${order.id}`" class="btn btn-success text-primary btn-sm">View</router-link>
+                    <router-link :to="`/sell/order/${order.id}`" class="btn btn-success text-base-100 btn-sm">View</router-link>
                 </th>
             </tr>
         </mt-table>

@@ -21,11 +21,11 @@
                     class="tabs tabs-boxed p-0 mr-4">
                         <a
                         @click="cr.tab = crTab.Informações"
-                        class="tab tab-sm text-neutral"
+                        class="tab tab-sm text-base-400"
                         :class="{'tab-active': cr.tab == crTab.Informações}">Informações</a> 
                         <a
                         @click="goToTransactions(cr.cashRegister.id)"
-                        class="tab tab-sm text-neutral"
+                        class="tab tab-sm text-base-400"
                         :class="{'tab-active': cr.tab == crTab.Transações}">Transações</a>
                     </div>
 
@@ -38,7 +38,7 @@
                 <div class="collapse-content bg-base-200 text-base-content">
                     <div v-if="cr.tab == crTab.Informações" class="flex flex-col sm:flex-row gap-4 py-4">
                         <div class="w-1/3">
-                            <h3 class="text-lg font-semibold text-neutral mb-2">Movimentação:</h3>
+                            <h3 class="text-lg font-semibold text-base-400 mb-2">Movimentação:</h3>
                             <p class="text-md my-1">
                                 Valor inicial: <b>{{ cr.cashRegister.initial_amount }}</b>
                             </p>
@@ -47,7 +47,7 @@
                             </p>
                         </div>
                         <div class="w-2/3">
-                            <h3 class="text-lg font-semibold text-neutral mb-2">Outras informações:</h3>
+                            <h3 class="text-lg font-semibold text-base-400 mb-2">Outras informações:</h3>
                             <p class="text-lg my-1">
                                 Usuário: <b>{{ cr.cashRegister.user }}</b>
                             </p>
@@ -58,7 +58,7 @@
                     </div>
 
                     <div v-else class="">
-                        <h3 class="text-lg font-semibold text-neutral my-4">Transações:</h3>
+                        <h3 class="text-lg font-semibold text-base-400 my-4">Transações:</h3>
                         <table class="w-full" align="center">
                             <thead>
                                 <tr>

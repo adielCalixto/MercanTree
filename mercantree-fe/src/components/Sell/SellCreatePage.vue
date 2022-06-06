@@ -70,14 +70,14 @@
 
             <div class="prices bg-base-200">
                 <div class="bg-base-200 p-4">
-                    <div class="text-md text-gray-600 flex justify-between">
+                    <div class="text-md text-base-400 flex justify-between">
                         <p>Subtotal</p>
                         <p>R${{ price }}</p>
                     </div>
 
                     <div class="divider my-1"></div> 
 
-                    <div class="text-md text-gray-600 flex justify-between">
+                    <div class="text-md text-base-400 flex justify-between">
                         <p>Desconto</p>
                         <p>$0,00</p>
                     </div>

@@ -2,7 +2,7 @@
     <div>
         <h1 class="text-xl text-base-content mb-8 font-bold">Tipo de pagamento</h1>
         <div class="collapse collapse-open">
-            <div class="collapse-title bg-primary text-primary-content font-semibold">
+            <div class="collapse-title bg-base-200 text-base-400 font-semibold">
                 Dinheiro
             </div>
             <div class="collapse-content bg-base-200 text-nase-content"> 

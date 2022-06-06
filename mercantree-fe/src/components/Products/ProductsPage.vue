@@ -3,7 +3,7 @@
         <h1 class="text-xl mb-12 font-bold">Lista de Produtos</h1>
 
         <div class="my-4 flex justify-between">
-            <router-link :to="$route.fullPath + '/create'" class="btn btn-success btn-sm text-primary">Adicionar</router-link>
+            <router-link :to="$route.fullPath + '/create'" class="btn btn-success btn-sm text-base-100">Adicionar</router-link>
             <select v-model="ordering"
             @change="listProducts()"
             class="select select-sm select-bordered ml-auto mr-4">
@@ -48,7 +48,7 @@
                     </router-link>
                 </th> 
                 <th>
-                    <router-link :to="`/products/product/${product.id}`" class="btn btn-success btn-sm text-primary">View</router-link>
+                    <router-link :to="`/products/product/${product.id}`" class="btn btn-success btn-sm text-base-100">View</router-link>
                 </th>
             </tr>
         </mt-table>
