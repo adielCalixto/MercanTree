@@ -1,9 +1,8 @@
 <template>
     <div class="max-w-md mx-auto py-16 p-4">
-        <div class="text-center py-2 bg-primary text-gray-100">
-            <h1 class="text-xl">Faça login no sistema</h1>
+        <div class="shadow-lg">
+            <h1 class="text-center text-xl font-semibold">Mercan<span class="text-green-400">Tree</span> | Login</h1>
         </div>
-
         <form @submit.prevent="login" class="p-4 bg-base-100 shadow-lg">
             <div class="form-control w-full">
                 <label class="label">
@@ -35,8 +34,8 @@
                     {{ v$.password.$errors[0].$message }}
                 </div>
             </div>
-            <div class="form-control items-end">
-                <button type="submit" class="btn btn-secondary btn-sm w-1/3 btn-outline">Entrar</button>
+            <div class="form-control">
+                <button type="submit" class="btn btn-success btn-sm btn-block btn-outline">Entrar</button>
             </div>
         </form>
     </div>
