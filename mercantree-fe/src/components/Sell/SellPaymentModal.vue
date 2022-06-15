@@ -15,7 +15,7 @@
                         <label class="label mr-auto">
                             <span class="text-xl">Valor recebido:</span>
                         </label>
-                        <input type="number" v-model="state.received" class="input">
+                        <input type="number" step="any" v-model="state.received" class="input">
                         <div class="absolute text-sm transform translate-y-full right-0 bottom-0 ml-auto gap-2" v-if="v$.received.$error">
                             {{ v$.received.$errors[0].$message }}
                         </div>

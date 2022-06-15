@@ -55,6 +55,7 @@
                         class="input input-sm input-primary"
                         type="number"
                         min="0"
+                        step="any"
                         v-model="state.depositAmount">
                     </div>
                     <button type="submit" class="btn btn-success btn-sm">

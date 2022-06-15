@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from django.utils import timezone
 from .models import Category, Product, Supplier
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
@@ -7,6 +7,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.decorators import action
 from django_filters import rest_framework as filters
 from rest_framework.filters import OrderingFilter
+from django.db.models import Sum, F
 
 
 class ProductFilter(filters.FilterSet):
@@ -30,9 +31,9 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], detail=False)
     def next_to_expiration(self, request):
-        start_date = date.today()
-        end_date = start_date + timedelta(days=6)
-        products = Product.objects.filter(expires_at__range=[start_date, end_date])
+        end_date = timezone.now()
+        start_date = end_date - timezone.timedelta(days=6)
+        products = Product.objects.filter(expires_at__range=[start_date, end_date]).order_by('-expires_at')
         
         page = self.paginate_queryset(products)
         if page is not None:
@@ -41,6 +42,15 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(products, many=True)
         return Response(serializer.data)
+
+    
+    @action(methods=['GET'], detail=False)
+    def paid_price(self, request):
+        product_paid_amount = Product.objects.aggregate(total=Sum(F('supplier_price')*F('quantity')))['total']
+
+        return Response({
+            'amount': '%.2f' % product_paid_amount if product_paid_amount else 0,
+        })
 
 
 class SupplierViewSet(viewsets.ModelViewSet):

@@ -30,13 +30,18 @@ class OrderViewSet(viewsets.ModelViewSet):
     ordering = ['-created']
 
     @action(methods=['GET'], detail=False)
-    def week_payment_amount(self, request):
+    def payment_amount(self, request):
+        interval = request.query_params.get('interval')
+        interval_list = { 'month': 30, 'week': 6, 'day': 1 }
+
+        days = interval_list.get(interval, 30)
+
         end_date = timezone.now()
-        start_date = end_date - timezone.timedelta(days=6)
-        payment_amount = Payment.objects.filter(created__range=[start_date, end_date]).aggregate(Sum('amount'))
+        start_date = end_date - timezone.timedelta(days=days)
+        payment_amount = Payment.objects.filter(created__range=[start_date, end_date], type='SALE').aggregate(Sum('amount'))
         amount = payment_amount['amount__sum'] if payment_amount['amount__sum'] else 0
 
-        return Response({'amount': amount})
+        return Response({'amount': '%.2f' % amount})
 
 
 class OrderProductViewSet(viewsets.ModelViewSet):
