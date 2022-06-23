@@ -20,9 +20,8 @@ interface Order {
     details?: string;
 }
 
-interface ExpandedOrder extends Omit<Order, 'user'|'products'> {
+interface ExpandedOrder extends Omit<Order, 'user'> {
     user: User;
-    products: ExpandedOrderProduct[];
 }
 
 export default Order

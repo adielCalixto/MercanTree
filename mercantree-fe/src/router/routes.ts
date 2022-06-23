@@ -33,14 +33,14 @@ const routes = [
             ] 
         },
         { 
-            path: '/products',
+            path: '/stock',
             component: MtModelPage,
-            name: 'Produtos',
+            name: 'Estoque',
             children: [
                 {
                     path: '',
-                    name: 'Listar produto',
-                    component: () => import('../components/Products/ProductsPage.vue'),
+                    name: 'Listar Estoque',
+                    component: () => import('../components/Products/StockProductsPage.vue'),
                 },
                 {
                     path: 'create',
@@ -48,7 +48,12 @@ const routes = [
                     component: () => import('../components/Products/ProductCreatePage.vue'),
                 },
                 {
-                    path: 'product/:id',
+                    path: 'products',
+                    name: 'Listar produtos',
+                    component: () => import('../components/Products/ProductsPage.vue'),
+                },
+                {
+                    path: 'products/product/:id',
                     name: 'Alterar produto',
                     component: () => import('../components/Products/ProductViewPage.vue'),
                 },

@@ -20,10 +20,19 @@
                             {{ v$.received.$errors[0].$message }}
                         </div>
                     </div>
-                    <div class="flex items-center my-6">
+
+                    <div
+                    v-if="back < 0"
+                    class="flex items-center my-6">
+                        <span class="text-xl mr-auto">Falta:</span>
+                        <p class="text-2xl">R${{ (-back).toFixed(2) }}</p>
+                    </div>
+
+                    <div
+                    v-else
+                    class="flex items-center my-6">
                         <span class="text-xl mr-auto">Troco:</span>
-                        <p v-if="back < 0" class="text-2xl">Falta R${{ (-back).toFixed(2) }}</p>
-                        <p v-else class="text-2xl">R${{ back }}</p>
+                        <p class="text-2xl">R${{ back.toFixed(2) }}</p>
                     </div>
 
                     <div class="bg-base-200 p-2 mt-8 flex justify-end">
@@ -36,11 +45,11 @@
 </template>
 
 <script setup lang="ts">
-    import useVuelidate from '@vuelidate/core';
-import { required, minValue, numeric } from '@vuelidate/validators';
-import { defineEmits, defineProps, computed, ref} from 'vue'
+    import useVuelidate from '@vuelidate/core'
+    import { required, minValue, numeric } from '@vuelidate/validators'
+    import { defineEmits, defineProps, computed, ref} from 'vue'
     import Payment from '../../interfaces/payments/payment.interface'
-    import PaymentService from '../../services/paymentService';
+    import PaymentService from '../../services/paymentService'
     import { useStore } from '../../stores/cashregister'
 
     interface Emits {

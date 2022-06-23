@@ -10,9 +10,9 @@
                 </router-link>
             </li>
             <li class="sidebar__item">
-                <router-link to="/products">
+                <router-link to="/stock">
                     <font-awesome-icon icon="book" />
-                    Produtos
+                    Estoque
                 </router-link>
             </li>
 

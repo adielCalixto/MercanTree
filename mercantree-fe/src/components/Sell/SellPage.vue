@@ -25,7 +25,10 @@
                 <th></th>
                 <th>R${{ order.payment.amount }}</th>
                 <th>{{ format_date(order.created ?? '') }}</th>
-                <th>{{ order.status }}</th>
+                <th class="text-xs">
+                    <p v-if="order.status == OrderStatus.Done">Paga</p>
+                    <p v-else-if="order.status == OrderStatus.Pending">Sem pagamento</p>
+                </th>
                 <th>
                     <font-awesome-icon class="text-success" v-if="order.payment.is_paid" icon="check" />
                     <font-awesome-icon class="text-warning" v-else icon="warning" />
@@ -54,75 +57,49 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
 import MtTable from '../MtTable.vue'
-import { defineComponent, ref, onBeforeMount } from 'vue'
-import Order from '../../interfaces/orders/order.interface'
+import { ref, onBeforeMount } from 'vue'
+import Order, { OrderStatus } from '../../interfaces/orders/order.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
 import { PAGE_SIZE } from '../../consts'
 import { computed } from '@vue/reactivity'
 import format_date from '../../utils/format_date'
 import OrderService from '../../services/orderService'
 
-export default defineComponent({
-    components: {
-        MtTable,
-    },
-    methods: {
-        format_date,
-    },
-    setup() {
-        const error = ref()
-        const table = {
-            name: 'Vendas',
-            fields: [
-                '',
-                'Valor',
-                'Data',
-                'Status',
-                'Pagamento',
-                'Cadastrante',
-                '',
-            ]
-        }
-        const isLoading = ref(false)
-        const creationModal = ref(false)
-        const activePage = ref(1)
-        const ordering = ref('')
-        const orders = ref<APIListResponse<Order>>({count: 0, results: []})
-        const pages = computed(() => Math.floor((orders.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
+const error = ref()
+const table = {
+    name: 'Vendas',
+    fields: [
+        '',
+        'Valor',
+        'Data',
+        'Status',
+        'Pagamento',
+        'Cadastrante',
+        '',
+    ]
+}
+const isLoading = ref(false)
+const creationModal = ref(false)
+const activePage = ref(1)
+const ordering = ref('')
+const orders = ref<APIListResponse<Order>>({count: 0, results: []})
+const pages = computed(() => Math.floor((orders.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
 
-        const listOrders = async () => {
-            try {
-                isLoading.value = true
-                const response = await OrderService().list(activePage.value, '', ordering.value)
-                isLoading.value = false
+const listOrders = async () => {
+    try {
+        isLoading.value = true
+        const response = await OrderService().list(activePage.value, '', ordering.value)
+        isLoading.value = false
 
-                orders.value = response
-            }
-            catch(e) {
-                error.value = e
-            }
-        }
+        orders.value = response
+    }
+    catch(e) {
+        error.value = e
+    }
+}
 
-        onBeforeMount(listOrders)
-
-        return {
-            error,
-            isLoading,
-            orders,
-            ordering,
-            listOrders,
-            pages,
-            activePage,
-            table,
-            creationModal,
-        }
-    },
-})
-
+onBeforeMount(listOrders)
 </script>
-
-<style>
-</style>

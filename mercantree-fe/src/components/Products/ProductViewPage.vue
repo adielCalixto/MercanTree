@@ -1,7 +1,7 @@
 <template>
     <div>
         <h1 class="text-2xl mb-12">Alterar produto</h1>
-        <h2 class="font-bold text-xl mb-8">{{ product?.name }}</h2>
+        <h2 class="mb-4">Preencha todos os campos e escolha uma das ações.</h2>
 
         <form class="relative" @keydown="(e) => e.key == 'Enter' ? e.preventDefault() : e">
             <div class="flex gap-4">
@@ -10,7 +10,7 @@
                 </label>
 
                 <input
-                v-model="product.name"
+                v-model="state.name"
                 type="text" 
                 class="input max-w-md input-sm input-bordered">
 
@@ -24,7 +24,7 @@
                 </label>
 
                 <input
-                v-model="product.description"
+                v-model="state.description"
                 type="text"
                 class="input max-w-md input-sm input-bordered">
             </div>
@@ -34,7 +34,7 @@
                 </label>
 
                 <v-select
-                v-model="product.category"
+                v-model="state.category"
                 class="w-full max-w-xs"
                 label="name"
                 :reduce="categoryReducer"
@@ -46,97 +46,29 @@
             </div>
             <div class="flex gap-4 w-full my-4">
                 <label class="label">
-                    <span class="label-text">* Preço:</span>
-                </label>
-
-                <input
-                min="0"
-                v-model="product.price"
-                type="number"
-                class="input max-w-md input-sm input-bordered">
-
-                <div class="badge badge-ghost rounded-none mt-1 gap-2" v-if="v$.price.$error">
-                    {{ v$.price.$errors[0].$message }}
-                </div>
-            </div>
-            <div class="flex gap-4 w-full my-4">
-                <label class="label">
-                    <span class="label-text">* Preço de custo:</span>
-                </label>
-
-                <input
-                min="0"
-                v-model="product.supplier_price"
-                type="number"
-                class="input max-w-md input-sm input-bordered">
-
-                <div class="badge badge-ghost rounded-none mt-1 gap-2" v-if="v$.supplier_price.$error">
-                    {{ v$.supplier_price.$errors[0].$message }}
-                </div>
-            </div>
-            <div class="flex gap-4 w-full my-4">
-                <label class="label">
-                    <span class="label-text">* Quantidade:</span>
-                </label>
-
-                <input
-                min="0"
-                v-model="product.quantity"
-                type="number"
-                class="input max-w-md input-sm input-bordered">
-
-                <div class="badge badge-ghost rounded-none mt-1 gap-2" v-if="v$.quantity.$error">
-                    {{ v$.quantity.$errors[0].$message }}
-                </div>
-            </div>
-            <div class="flex gap-4 w-full my-4">
-                <label class="label">
-                    <span class="label-text">Quantidade em estoque:</span>
-                </label>
-
-                <input
-                min="0"
-                v-model="product.stock_quantity"
-                type="text"
-                class="input max-w-md input-sm input-bordered"
-                readonly>
-            </div>
-            <div class="flex gap-4 w-full my-4">
-                <label class="label">
-                    <span class="label-text">Validade:</span>
-                </label>
-                <input
-                v-model="product.expires_at"
-                type="date"
-                class="input max-w-md input-sm input-bordered">
-            </div>
-            <div class="flex gap-4 w-full my-4">
-                <label class="label">
                     <span class="label-text">Código de barras:</span>
                 </label>
 
                 <input
-                v-model="product.barcode"
+                v-model="state.barcode"
                 type="text"
                 class="input max-w-md input-sm input-bordered">
             </div>
-            <div class="flex gap-4 w-full my-4">
-                <label class="label">
-                    <span class="label-text">Fornecedor</span>
-                </label>
-
-                <v-select
-                v-model="product.supplier_id"
-                class="w-full max-w-xs"
-                label="name"
-                :reduce="supplierReducer"
-                :options="suppliers.results" />
-            </div>
-            <div class="flex justify-end gap-4 bg-base-200 p-4">
-                <button class="btn btn-error btn-outline btn-sm" @click.prevent="deleteProduct()">Deletar</button>
-                <button class="btn btn-secondary btn-sm" @click.prevent="updateProduct()">Salvar</button>
-            </div>
         </form>
+        
+        <div class="flex justify-end gap-4 bg-base-200 p-4">
+            <button
+            class="btn btn-error btn-sm btn-outline"
+            @click.prevent="deleteProduct()">
+                Deletar
+            </button>
+
+            <button
+            class="btn btn-primary btn-sm"
+            @click.prevent="updateProduct()">
+                Salvar
+            </button>
+        </div>
 
         <ProductCategoryModal
         v-if="editCategories"
@@ -144,144 +76,95 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
-import { computed, defineComponent, onMounted, reactive, ref } from "vue"
+import useVuelidate from "@vuelidate/core"
+import { required } from "@vuelidate/validators"
+import swal from "sweetalert"
+import { computed, onBeforeMount, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import productsService from "../../services/productService"
-import { Product } from '../../interfaces/products/product.interface'
-import ProductCategoryModal from "./ProductCategoryModal.vue"
 import { APIListResponse } from "../../interfaces/common/response.interface"
 import Category from "../../interfaces/products/category.interface"
-import { Supplier } from "../../interfaces/suppliers/supplier.interface"
+import { Product } from "../../interfaces/products/product.interface"
 import categoryService from "../../services/categoryService"
-import SupplierService from "../../services/supplierService"
-import swal from "sweetalert"
-import useVuelidate from "@vuelidate/core"
-import { decimal, minValue, numeric, required } from "@vuelidate/validators"
 import errorService from "../../services/errorService"
+import ProductService from "../../services/productService"
+import ProductCategoryModal from "./ProductCategoryModal.vue"
 
-export default defineComponent({
-    components: {
-        ProductCategoryModal,
-    },
-    async setup() {
-        const route = useRoute()
-        const router = useRouter()
-        const id = parseInt(route.params.id.toString())
-        const product = ref<Product>({
-            name: '',
-            description: '',
-            price: '0.00',
-            barcode: '',
-            supplier_id: undefined,
-            category: '',
-            expires_at: undefined,
-            supplier_price: '0.0',
-            quantity: 0,
-        })
+const state = ref<Product>({
+    name: '',
+    description: '',
+    barcode: '',
+    supplier_id: undefined,
+    category: '',
+})
 
-        const rules = computed(() => ({
-            name: { required, $autoDirty: true },
-            price: { required, decimal, minValue: minValue(product.value.supplier_price), $autoDirty: true },
-            supplier_price: { required, decimal, minValue: minValue(0), $autoDirty: true },
-            quantity: { required, numeric, minValue: minValue(1), $autoDirty: true },
-        }))
+const rules = computed(() => ({
+    name: { required, $autoDirty: true },
+}))
 
-        const v$ = useVuelidate(rules, product)
-        
-        const editCategories = ref(false)
-        const categories = ref<APIListResponse<Category>>({ count: 0, results: [] })
-        const suppliers = ref<APIListResponse<Supplier>>({ count: 0, results: [] })
+const v$ = useVuelidate(rules, state)
 
-        const isLoading = ref(false)
+const categories = ref<APIListResponse<Category>>({ count: 0, results: [] })
+const isLoading = ref(false)
+const route = useRoute()
+const router = useRouter()
+const editCategories = ref(false)
 
-        const getProduct = async () => {
-            try {
-                isLoading.value = true
-                const response = await productsService().retrieve(id)
-                product.value = response
-                if(response.expires_at) {
-                    product.value.expires_at = new Date(response.expires_at).toISOString().substring(0, 10)
-                }
-                isLoading.value = false
-            } catch(e) {
-                router.push('/products')
-            }
-        }
+const id = parseInt(route.params.id.toString())
 
-        const updateProduct = async () => {
-            try {
-                await v$.value.$validate()
-                if (v$.value.$error) return
+const getProduct = async () => {
+    isLoading.value = true
+    const response = await ProductService().retrieve(id)
+    isLoading.value = false
+    state.value = response
+}
 
-                const response = await productsService().update(id, product.value)
-                product.value = response
-                
-                await swal('Sucesso', 'Produto editado', 'success')
+const updateProduct = async () => {
+    try {
+        await v$.value.$validate
+        if(v$.value.$error) return
 
-                router.push('/products')
-            } catch(e) {
-                return
-            }
-        }
+        isLoading.value = true
+        const response = await ProductService().update(id, state.value)
 
-        const deleteProduct = async () => {
+        isLoading.value = false
+
+        await swal('Sucesso', 'Produto editado', 'success')
+    } catch(e) {
+        return
+    }
+}
+
+const deleteProduct = async () => {
             try {
                 await errorService().onWarn()
 
-                const response = await productsService().destroy(id)
+                const response = await ProductService().destroy(id)
 
                 await swal('Sucesso', 'Produto deletado', 'success')
 
-                router.push('/products')
+                router.push('/products/outofstock')
             } catch(e) {
                 return
             }
         }
 
-        const getCategories = async () => {
-            try {
-                const response = await categoryService().list()
-                categories.value = response
-            }
-            catch(e) {
-                return
-            }
-        }
+const getCategories = async () => {
+    try {
+        const response = await categoryService().list()
+        categories.value = response
+    }
+    catch(e) {
+        return
+    }
+}
 
-        const getSuppliers = async () => {
-            try {
-                const response = await SupplierService().list()
-                suppliers.value = response
-            }
-            catch(e) {
-                return
-            }
-        }
+const categoryReducer = (c: Category) => c.name
 
-        const categoryReducer = (c: Category) => c.name
-        const supplierReducer = (s: Supplier) => s.id
-
-        onMounted(async () => {
-            await getProduct()
-            await getCategories()
-            await getSuppliers()
-        })
-
-        return {
-            product,
-            v$,
-            isLoading,
-            updateProduct,
-            deleteProduct,
-            categories,
-            editCategories,
-            getCategories,
-            suppliers,
-            categoryReducer,
-            supplierReducer,
-        }
-    },
+onBeforeMount(async () => {
+    await getProduct()
+    await getCategories()
 })
+
 </script>

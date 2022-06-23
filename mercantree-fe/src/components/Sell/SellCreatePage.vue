@@ -18,7 +18,7 @@
                 <div v-if="selectedProduct != undefined" class="flex flex-col">
                     <p class="text-xs font-semibold">Selecionado:</p>
                     <p class="text-md font-bold">
-                        {{ selectedProduct.name }} - R${{ selectedProduct.price }}
+                        {{ selectedProduct.product.name }} - R${{ selectedProduct.price }}
                     </p>
                 </div>
 
@@ -39,7 +39,7 @@
                     <div
                     class="absolute bottom-0 transform rounded-none translate-y-full text-sm font-bold"
                     v-if="v$.product.quantity.maxValue.$invalid">
-                        !Em estoque: {{ selectedProduct?.stock_quantity }}
+                        Em estoque: {{ selectedProduct?.quantity }}!
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@
             <div class="w-full max-h-48 overflow-y-auto">
                 <div v-for="p in orderStore.products" class="flex gap-4 items-center text-lg border-b-2 border-base-300 mb-2">
                     <p>{{ orderStore.products.indexOf(p) }}</p>
-                    <p>{{ p.data.name }}</p>
+                    <p>{{ p.data.product.name }}</p>
                     <div class="flex gap-4 ml-auto">
                         <p class="text-gray-500">{{ p.quantity }} X {{ get_price(p.data.price) }}</p>
                         <p class="font-bold">= R${{ (parseFloat(p.data.price) * p.quantity).toFixed(2) }}</p>
@@ -94,7 +94,7 @@
 
         <div class="bg-base-200 p-2 flex justify-end">
             <button @click="orderStore.$reset()" class="btn btn-sm btn-outline">Cancelar venda</button>
-            <button @click="saveOrder()" class="btn btn-sm btn-error">Pagar</button>
+            <button @click="saveOrder()" class="btn btn-sm btn-error ml-4">Pagar</button>
         </div>
 
         <div class="modal modal-open" v-if="createModalOpen">
@@ -115,9 +115,8 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, computed } from 'vue'
+    import { defineComponent, ref, computed, onMounted } from 'vue'
     import { OrderStatus } from '../../interfaces/orders/order.interface'
-    import { Product } from '../../interfaces/products/product.interface'
     import { useStore } from '../../stores/auth'
     import { useOrderStore } from '../../stores/order'
     import SellProductsModal from './SellProductsModal.vue'
@@ -128,6 +127,8 @@
     import swal from 'sweetalert'
     import { maxValue, minValue, required } from '@vuelidate/validators'
     import useVuelidate from '@vuelidate/core'
+    import StockProduct from '../../interfaces/products/stock_product.interface'
+    import { Product } from '../../interfaces/products/product.interface'
 
     export default defineComponent({
     components: {
@@ -142,7 +143,7 @@
         const store = useStore()
         const router = useRouter()
 
-        const selectedProduct = ref<Product>()
+        const selectedProduct = ref<StockProduct & { product: Product }>()
 
         const state = ref({
             details: '',
@@ -155,7 +156,7 @@
         const rules = computed(() => ({
             product: {
                 search: { required, $autoDirty: true },
-                quantity: { required, minValue: minValue(1), maxValue: maxValue(selectedProduct.value?.stock_quantity ?? Number.MAX_VALUE), $autoDirty: true },
+                quantity: { required, minValue: minValue(1), maxValue: maxValue(selectedProduct.value?.quantity ?? Number.MAX_VALUE), $autoDirty: true },
             }
         }))
 
@@ -174,11 +175,6 @@
             try {
                 if(!store.id) return
 
-                if (orderStore.order?.id) {
-                    router.push(`/sell/order/${orderStore.order?.id}`)
-                    return orderStore.$reset()
-                }
-
                 orderStore.order = {
                     user: store.id,
                     details: state.value.details,
@@ -188,7 +184,7 @@
                     },
                     products: orderStore.products.map(p => {
                         return {
-                            quantity: p.quantity,
+                            sale_quantity: p.quantity,
                             product: p.data.id
                         }
                     })
@@ -224,7 +220,7 @@
             }
         }
 
-        const preloadProduct = (p: Product) => {
+        const preloadProduct = (p: StockProduct & { product: Product }) => {
             selectedProduct.value = p
             createModalOpen.value = false
         }
@@ -260,6 +256,12 @@
         const removeProduct = (index: number) => {
             orderStore.products.splice(index, 1)
         }
+
+        onMounted(() => {
+            if (orderStore.order?.id) {
+                return orderStore.$reset()
+            }
+        })
 
         return {
             state,

@@ -3,17 +3,13 @@
         <h1 class="text-xl mb-12">Lista de Produtos</h1>
 
         <div class="my-4 flex justify-between">
-            <router-link :to="$route.fullPath + '/create'" class="btn btn-success btn-sm">Adicionar</router-link>
+            <router-link :to="'/stock/create'" class="btn btn-success btn-sm">Adicionar</router-link>
             <select v-model="ordering"
             @change="listProducts()"
             class="select select-sm select-bordered ml-auto mr-4">
                 <option value="" disabled selected>Ordenar</option>
                 <option value="name">Nome-ASC</option>
                 <option value="-name">Nome-DESC</option>
-                <option value="price">Preço-ASC</option>
-                <option value="-price">Preço-DESC</option>
-                <option value="expires_at">Data de validade-ASC</option>
-                <option value="-expires_at">Data de validade-DESC</option>
             </select>
             <div class="form-control">
                 <div class="input-group">
@@ -35,22 +31,26 @@
         </div>
 
         <mt-table :table="table" v-else >
-            <tr v-for="product in products.results">
-                <th> {{ product.id }}</th>
-                <th> {{ product.name }} </th>
-                <th> {{ product.description }} </th>
-                <th> {{ format_date(product.expires_at) }} </th>
-                <th> {{ get_price(product.price) }} </th>
-                <th> {{ product.barcode }} </th>
-                <th> {{ product.quantity }} </th>
-                <th> {{ product.category }} </th>
+            <tr v-for="p in products.results">
+                <th> {{ p.id }}</th>
+                <th> {{ p.name }} </th>
+                <th> {{ p.description }} </th>
+                <th> {{ p.barcode }} </th>
+                <th> {{ p.category }} </th>
                 <th>
-                    <router-link v-if="product.supplier_id" :to="`/suppliers/supplier/${product.supplier_id}`" class="btn btn-rounded btn-sm">
-                        <font-awesome-icon icon="external-link" />
+                    <router-link
+                    :to="`/stock/products/product/${p.id}`"
+                    class="btn btn-sm btn-primary btn-outline btn-square">
+                        <font-awesome-icon icon="edit" />
                     </router-link>
                 </th>
                 <th>
-                    <router-link :to="`/products/product/${product.id}`" class="btn btn-primary btn-sm">View</router-link>
+                    <button
+                    @click="selectedProductId = p.id, stockFormOpen = true"
+                    class="btn btn-sm btn-success">
+                        <font-awesome-icon icon="add" />
+                        Estoque
+                    </button>
                 </th>
             </tr>
         </mt-table>
@@ -63,79 +63,90 @@
                 @click="activePage = page, listProducts()">{{ page }}</button>
             </div>
         </div>
+
+        <div
+        v-if="stockFormOpen && selectedProductId"
+        class="modal modal-open">
+            <div class="modal-box">
+                <h2 class="text-xl">Adicionar estoque ao produto</h2>
+                <p class="text-md mb-4 font-bold">{{ products.results.find(p => p.id == selectedProductId)?.name }}</p>
+
+                <stock-form
+                @submit="state => createStock(state)"
+                @cancel="closeModal()"
+                :state="{ product: selectedProductId, quantity: '', price: '', purchase_price: '', delete_on_deplete: false }">
+                    
+                </stock-form>
+            </div>
+        </div>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
-import { defineComponent, ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount } from 'vue'
 import MtTable from "../MtTable.vue"
-import ProductService from '../../services/productService'
-import { Product } from '../../interfaces/products/product.interface'
 import { APIListResponse } from '../../interfaces/common/response.interface'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { PAGE_SIZE } from '../../consts'
-import format_date from "../../utils/format_date"
-import get_price from '../../utils/get_price'
+import { Product } from '../../interfaces/products/product.interface'
+import ProductService from '../../services/productService'
+import StockForm from './StockForm.vue'
+import StockProduct from '../../interfaces/products/stock_product.interface'
+import StockService from '../../services/stockService'
+import swal from 'sweetalert'
 
-export default defineComponent({
-    components: {
-        MtTable,
-        RouterLink,
-    },
-    methods: {
-        format_date,
-        get_price,
-    },
-    async setup() {
-        const table = {
-            name: 'Produtos',
-            fields: [
-                '',
-                'Nome',
-                'Descrição',
-                'Validade',
-                'Preço',
-                'Código de barras',
-                'Quantidade',
-                'Categoria',
-                'Fornecedor',
-                '',
-            ],
-        }
+const table = {
+    name: 'Produtos',
+    fields: [
+        '',
+        'Nome',
+        'Descrição',
+        'Código de barras',
+        'Categoria',
+        '',
+        '',
+    ],
+}
 
-        const search = ref('')
-        const ordering = ref('')
-        const error = ref()
-        const products = ref<APIListResponse<Product>>({count: 0, results: []})
-        const isLoading = ref(false)
-        const pages = computed(() => Math.floor((products.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
-        const activePage = ref(1)
+const route = useRoute()
+const search = ref(route.query.search?.toString())
+const ordering = ref('')
+const products = ref<APIListResponse<Product>>({ count: 0, results: [] })
+const isLoading = ref(false)
+const pages = computed(() => Math.floor((products.value.count + PAGE_SIZE - 1) / PAGE_SIZE))
+const activePage = ref(1)
 
-        const listProducts = async () => {
-            try {
-                isLoading.value = true
-                const response = await ProductService().list(activePage.value, search.value, ordering.value)
-                products.value = response
-                isLoading.value = false
-            } catch(e) {
-                error.value = e
-            }
-        }
+const stockFormOpen = ref(false)
+const selectedProductId = ref<number | undefined>()
 
-        onBeforeMount(listProducts)
-
-        return {
-            table,
-            products,
-            error,
-            search,
-            listProducts,
-            pages,
-            activePage,
-            ordering,
-        }
+const listProducts = async () => {
+    try {
+        isLoading.value = true
+        const response = await ProductService().list(activePage.value, search.value, ordering.value)
+        products.value = response
+        isLoading.value = false
+    } catch(e) {
+        return
     }
-})
+}
+
+const closeModal = () => {
+    stockFormOpen.value = false
+    selectedProductId.value = undefined
+}
+
+const createStock = async (state: StockProduct) => {
+    try {
+        await StockService().create(state)
+        closeModal()
+        swal('Sucesso', 'Estoque adicionado ao produto', 'success')
+    }
+    catch(e) {
+        return
+    }
+}
+
+onBeforeMount(listProducts)
 
 </script>

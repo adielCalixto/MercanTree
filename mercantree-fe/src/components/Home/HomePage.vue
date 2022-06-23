@@ -71,8 +71,8 @@
                         class="alert alert-warning shadow-md alert-sm">
                             <div>
                                 <font-awesome-icon icon="warning" />
-                                <p>{{ p.name }}</p>
-                                <router-link :to="`/products/product/${p.id}/`" class="ml-auto btn btn-sm btn-ghost btn-square">
+                                <p>{{ p.product.name }}</p>
+                                <router-link :to="`/stock/?search=${p.product.name}`" class="ml-auto btn btn-sm btn-ghost btn-square">
                                     <font-awesome-icon icon="external-link" />
                                 </router-link>
                             </div>
@@ -98,8 +98,10 @@ import OrderService from '../../services/orderService'
 import { onBeforeMount, ref } from 'vue'
 import get_price from '../../utils/get_price'
 import { APIListResponse } from '../../interfaces/common/response.interface'
-import { Product } from '../../interfaces/products/product.interface'
 import { RouterLink } from 'vue-router'
+import StockService from '../../services/stockService'
+import StockProduct from '../../interfaces/products/stock_product.interface'
+import { Product } from '../../interfaces/products/product.interface'
 
 const isLoading = ref(false)
 
@@ -107,7 +109,7 @@ const orderWeekPayments = ref('0.00')
 const orderMonthPayments = ref('0.00')
 const productsPaidAmount = ref('0.00')
 const productCount = ref(0)
-const productsNextToExpiration = ref<APIListResponse<Product>>({ count: 0, results: [] })
+const productsNextToExpiration = ref<APIListResponse<StockProduct & { product: Product }>>({ count: 0, results: [] })
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -126,34 +128,40 @@ const getProfit = (finalAmount: string, initialAmount: string) => {
 const getData = async () => {
     isLoading.value = true
 
-    const response = await ProductService().list()
-    productCount.value = response.count
+    try {
 
-    const response1 = await ProductService().paidAmount()
-    productsPaidAmount.value = response1.amount
+        const response = await ProductService().list()
+        productCount.value = response.count
 
-    const response2 = await OrderService().paymentAmount('week')
-    orderWeekPayments.value = response2.amount
-    
-    const response3 = await OrderService().paymentAmount()
-    orderMonthPayments.value = response3.amount
+        const response2 = await OrderService().paymentAmount('week')
+        orderWeekPayments.value = response2.amount
 
-    const response4 = await ProductService().nextToExpire()
-    productsNextToExpiration.value = response4
+        const response3 = await OrderService().paymentAmount()
+        orderMonthPayments.value = response3.amount
 
-    chartData.value = {
-        labels: ['Lucro (R$)', 'Valor estimado em produtos (R$)', 'Valor estimado em vendas (R$)'],
-        datasets: [
-            {
-                label: 'Total',
-                backgroundColor: ['#03FCBA', '#F15946', '#53B3CB'],
-                data: [
-                    getProfit(orderMonthPayments.value, productsPaidAmount.value),
-                    parseFloat(productsPaidAmount.value),
-                    parseFloat(orderMonthPayments.value),
-                ]
-            }
-        ]
+        const response1 = await StockService().paidAmount()
+        productsPaidAmount.value = response1.amount
+
+        const response4 = await StockService().nextToExpire()
+        productsNextToExpiration.value = response4
+
+        chartData.value = {
+            labels: ['Lucro (R$)', 'Valor estimado em produtos (R$)', 'Valor estimado em vendas (R$)'],
+            datasets: [
+                {
+                    label: 'Total',
+                    backgroundColor: ['#03FCBA', '#F15946', '#53B3CB'],
+                    data: [
+                        getProfit(orderMonthPayments.value, productsPaidAmount.value),
+                        parseFloat(productsPaidAmount.value),
+                        parseFloat(orderMonthPayments.value),
+                    ]
+                }
+            ]
+        }
+    }
+    catch(e) {
+        return
     }
 
     isLoading.value = false

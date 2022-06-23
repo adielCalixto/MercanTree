@@ -1,14 +1,16 @@
-import { Product } from "../products/product.interface";
+import StockProduct from "../products/stock_product.interface"
 
 interface OrderProduct {
     product: number;
-    quantity: number;
-    id?: string;
+    uid?: string;
     order?: number;
+    sale_quantity: string;
+    sale_price?: string;
+    reference?: string;
 }
 
 interface ExpandedOrderProduct extends Omit<OrderProduct, 'product'> {
-    product: Product;
+    product: StockProduct;
 }
 
 export default OrderProduct

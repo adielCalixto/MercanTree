@@ -28,11 +28,11 @@
                 <h3 class="text-lg mb-4">Produtos:</h3>
                 <div class="w-full">
                     <div v-for="p in order?.products" class="flex gap-4 text-lg border-b-2 border-base-300 mb-2">
-                        <p>{{ order?.products.indexOf(p) }}</p>
-                        <p>{{ p.product.name }}</p>
+                        <p>{{ order?.products?.indexOf(p) }}</p>
+                        <p>{{ p.reference }}</p>
                         <div class="flex gap-4 ml-auto">
-                            <p class="text-gray-500">{{ p.quantity }} X {{ get_price(p.product.price) }}</p>
-                            <p class="font-bold">= R${{ (parseFloat(p.product.price) * p.quantity).toFixed(2) }}</p>
+                            <p class="text-gray-500">{{ p.sale_quantity }} X {{ get_price(p.sale_price ?? '0') }}</p>
+                            <p class="font-bold">= R${{ (parseFloat(p.sale_price ?? '0') * parseFloat(p.sale_quantity)).toFixed(2) }}</p>
                         </div>
                     </div>
                 </div>
@@ -101,7 +101,7 @@ const state = ref({
 const activeTab = ref(0)
 
 const rules = {
-    depositAmount: { $autoDirty: true, required, minValue: minValue(1) }
+    depositAmount: { $autoDirty: true, required, minValue: minValue(0.01) }
 }
 
 const v$ = useVuelidate(rules, state)

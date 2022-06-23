@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import Order from '../interfaces/orders/order.interface'
-import { Product } from '../interfaces/products/product.interface';
-import CashRegisterService from '../services/cashRegisterService'
+import { Product } from '../interfaces/products/product.interface'
+import StockProduct from '../interfaces/products/stock_product.interface'
 import OrderService from '../services/orderService'
 
 interface ProductWithQuantity {
     quantity: number;
-    data: Product;
+    data: StockProduct & { product: Product };
 }
 
 interface OrderStore {
