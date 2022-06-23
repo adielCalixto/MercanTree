@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Vue select custom styles */
+:root, [data-theme] {
+    --vs-controls-color: theme('colors.gray.400');
+    
+    --vs-dropdown-bg: theme('colors.base-200');
+    --vs-dropdown-option-color: theme('colors.base-content');
+    
+    --vs-selected-color: theme('colors.base-content');
+    
+    --vs-search-input-color: theme('colors.base-content');
+    
+    --vs-dropdown-bg: theme('colors.base-100');
+    --vs-dropdown-option--active-bg: theme('colors.primary');
+}
 
 body {
     @apply h-screen;

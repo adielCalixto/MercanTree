@@ -9,8 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faAdd, faChartBar, faTrash, faRemove, faCheck, faExternalLink, faUser, faHome, faCashRegister, faCog, faBook, faSearch, faDollar, faTruck, faBars, faUserCheck, faWarning, faArrowLeft, faEdit)
 
 import App from './App.vue'
-import './index.css'
 import "vue-select/dist/vue-select.css"
+import './index.css'
 import router from './router'
 
 const app = createApp(App)
