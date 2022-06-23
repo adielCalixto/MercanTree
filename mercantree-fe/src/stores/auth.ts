@@ -19,6 +19,7 @@ export const useStore = defineStore('auth', {
                 this.username = response.user_name
                 this.id = response.user_id
                 axios.defaults.headers.common['Authorization'] = `Token ${response.token}`;
+                window.sessionStorage.setItem('mercantree-auth', JSON.stringify(this.$state))
                 return Promise.resolve()
             })
             .catch(error => {
@@ -27,10 +28,22 @@ export const useStore = defineStore('auth', {
         },
         logoutUser() {
             delete axios.defaults.headers.common['Authorization'];
+            window.sessionStorage.removeItem('mercantree-auth')
 
             this.token = ''
             this.username = ''
             this.id = undefined
+        },
+        restoreSession() {
+            const prevState = window.sessionStorage.getItem('mercantree-auth')
+            
+            if(prevState != undefined) {
+                const state: LoggedUser = JSON.parse(prevState)
+
+                this.$reset
+                this.$state = state
+                axios.defaults.headers.common['Authorization'] = `Token ${state.token}`;
+            }
         }
     }
 })
