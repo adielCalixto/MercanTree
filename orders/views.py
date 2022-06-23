@@ -48,7 +48,7 @@ class OrderProductViewSet(viewsets.ModelViewSet):
     queryset = OrderProduct.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderProductSerializer
-    ordering = ['quantity']
+    ordering = ['reference']
     filter_backends = [OrderingFilter]
 
 

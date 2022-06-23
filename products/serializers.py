@@ -1,32 +1,25 @@
 from rest_framework import serializers
-from .models import Category, Supplier, Product
-from django.db.models import Sum
-from orders.models import OrderProduct
-
+from .models import Category, StockProduct, Supplier, Product
+from rest_flex_fields import FlexFieldsModelSerializer
 
 class ProductSerializer(serializers.ModelSerializer):
-    stock_quantity = serializers.SerializerMethodField()
     category = serializers.SlugRelatedField('name', queryset=Category.objects.all(), allow_null=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'barcode', 'expires_at', 'price', 'category', 'quantity', 'stock_quantity', 'supplier_id', 'supplier_price']
+        fields = ['id', 'name', 'description', 'barcode', 'category']
         read_only_fields = ['id']
 
+
+class StockProductSerializer(FlexFieldsModelSerializer):
     
-    def get_stock_quantity(self, obj):
-        product_count = obj.quantity
-        in_order_count = OrderProduct.objects.filter(product_id=obj.id).aggregate(Sum('quantity'))
-        count = product_count - (in_order_count['quantity__sum'] if in_order_count['quantity__sum'] else 0)
-
-        return count
-
-
-    def validate_quantity(self, value):
-        if value <= 0:
-            raise serializers.ValidationError('Quantity should be bigger than 0')
-
-        return value
+    class Meta:
+        model = StockProduct
+        fields = '__all__'
+        read_only_fields = ['id']
+        expandable_fields = {
+            'product': ProductSerializer
+        }
 
 
 class SupplierSerializer(serializers.ModelSerializer):

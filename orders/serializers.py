@@ -1,18 +1,16 @@
 import uuid
 from rest_framework import serializers
 from payments.serializers import PaymentSerializer
-from products.models import Product
-from products.serializers import ProductSerializer
+from products.models import StockProduct
 from users.models import User
 from users.serializers import UserSerializer
-from django.db.models import Sum
 from .models import Order, OrderProduct, Coupon
 from payments.models import Payment
 from rest_flex_fields import FlexFieldsModelSerializer
 
 
 class OrderProductSerializer(FlexFieldsModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product = serializers.PrimaryKeyRelatedField(queryset=StockProduct.objects.all(), allow_null=True)
 
     class Meta:
         model = OrderProduct
@@ -21,34 +19,13 @@ class OrderProductSerializer(FlexFieldsModelSerializer):
             'order': {
                 'write_only': True,
             },
-            'id': {
+            'uid': {
                 'validators': []
-            }
-        }
-        expandable_fields = {
-            'product': ProductSerializer,
+            },
         }
 
-    def validate(self, data):
-        # custom validation method to check if OrderProduct's product has stock
 
-        # get the Product serializer to access the stock_quantity field
-        product_serializer = ProductSerializer(instance=data['product'])
-        current_amount = 0
-
-        if 'id' in data.keys():
-            order_product = OrderProduct.objects.get(id=uuid.UUID(data['id']))
-            current_amount = order_product.quantity
-
-        # if the Product does not have the desired quantity, throws validation error
-        if data['quantity'] > (product_serializer.data['stock_quantity'] + current_amount):
-            raise serializers.ValidationError({'quantity': ['Product has no stock']})
-
-
-        return data
-    
-
-    def validate_quantity(self, value):
+    def validate_sale_quantity(self, value):
         if value <= 0:
             raise serializers.ValidationError('Quantity should be bigger than 0')
 
@@ -57,7 +34,7 @@ class OrderProductSerializer(FlexFieldsModelSerializer):
 
     def create(self, validated_data):        
         # pop id, since it should be generated automatically
-        validated_data.pop('id', None)
+        validated_data.pop('uid', None)
 
         # create order_product
         order_product = OrderProduct.objects.create(**validated_data)
@@ -66,11 +43,11 @@ class OrderProductSerializer(FlexFieldsModelSerializer):
 
     def update(self, instance, validated_data):        
         # pop id, since it should not be updated
-        validated_data.pop('id', None)
+        validated_data.pop('uid', None)
 
         # create order_product
         instance.product = validated_data.get('product', instance.product)
-        instance.quantity = validated_data.get('quantity', instance.quantity)
+        instance.quantity = validated_data.get('sale_quantity', instance.sale_quantity)
         instance.order = validated_data.get('order', instance.order)
         instance.save()
 
@@ -122,7 +99,7 @@ class OrderSerializer(FlexFieldsModelSerializer):
                 product.pop('order', None)
 
                 # pop id, since it should fallback to default
-                product.pop('id', None)
+                product.pop('uid', None)
 
                 # create OrderProduct
                 OrderProduct.objects.create(order=order, **product) 
@@ -152,19 +129,19 @@ class OrderSerializer(FlexFieldsModelSerializer):
             payment.save()
 
         # get all OrderProducts that belongs to this order
-        order_products_with_order_id = OrderProduct.objects.filter(order=instance.pk).values_list('id', flat=True)
+        order_products_with_order_id = OrderProduct.objects.filter(order=instance.pk).values_list('uid', flat=True)
         order_products_id_pool = []
 
         # iterate through found OrderProducts
         for order_product in order_products:
             # check if OrderProduct has an id
-            if "id" in order_product.keys():
+            if "uid" in order_product.keys():
                 # if so, update id
                 try:
                     # to get an OrderProduct's instance, the id shoud be an UUID
-                    order_product_instance = OrderProduct.objects.get(id=uuid.UUID(order_product['id']))
+                    order_product_instance = OrderProduct.objects.get(uid=uuid.UUID(order_product['uid']))
                     order_product_instance.product = order_product.get('product', order_product_instance.product)
-                    order_product_instance.quantity = order_product.get('quantity',order_product_instance.quantity)
+                    order_product_instance.sale_quantity = order_product.get('sale_quantity',order_product_instance.sale_quantity)
                     order_product_instance.save()
 
                     # the accessable id is not an UUID
@@ -179,13 +156,14 @@ class OrderSerializer(FlexFieldsModelSerializer):
                 order_product.pop('order', None)
 
                 # pop id, since it should fallback to default
-                order_product.pop('id', None)
+                order_product.pop('uid', None)
 
                 order_product_instance = OrderProduct.objects.create(order=instance, **order_product)
 
                 # id returned from Model.objects.create() is already an UUID
                 order_products_id_pool.append(order_product_instance.pk)
         
+
         for order_product_id in order_products_with_order_id:
             # again, the id returned from Model.objects.filter() is not UUID, so it needs to be converted
             if uuid.UUID(order_product_id) not in order_products_id_pool:
